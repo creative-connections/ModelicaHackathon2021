@@ -413,7 +413,8 @@ package Hackathon2021
   end BasicCirculation3;
 
   model BasicCirculation4
-    replaceable package Blood = Physiolibrary.Media.Water;
+    replaceable package Blood = Physiolibrary.Media.Water constrainedby
+      Media.Interfaces.PartialMedium annotation (choicesAlMatching=true);
     //package Blood = Physiolibrary.Media.BloodBySiggaardAndersen
     Physiolibrary.Fluid.Components.ElasticVessel arteries(
       redeclare package Medium = Blood,
