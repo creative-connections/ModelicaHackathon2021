@@ -722,8 +722,6 @@ package Hackathon2021
     Physiolibrary.Fluid.Sensors.FlowMeasure totalVentilation(redeclare package
         Medium = Physiolibrary.Media.Air)
       annotation (Placement(transformation(extent={{50,58},{70,78}})));
-    Physiolibrary.Fluid.Components.ElasticVessel elasticVessel
-      annotation (Placement(transformation(extent={{-12,-54},{8,-34}})));
   equation
     connect(alveolarVentilationPost.q_in, alveolar.q_in[1]) annotation (Line(
         points={{22,24},{14,24},{14,38},{-20,38},{-20,19.7333},{-0.1,19.7333}},
@@ -854,6 +852,149 @@ package Hackathon2021
       Compliance(displayUnit="ml/mmHg") = 6.0004926067653e-07,
       ZeroPressureVolume(displayUnit="l") = 0.0013,
       ExternalPressure(displayUnit="mmHg") = 100791.72488574,
+      nPorts=5) annotation (Placement(transformation(extent={{-10,-10},{10,10}},
+
+          rotation=90,
+          origin={0,18})));
+    Physiolibrary.Fluid.Sensors.FlowMeasure alveolarVentilationPost(redeclare
+        package Medium = Physiolibrary.Media.Air)
+      annotation (Placement(transformation(extent={{22,14},{42,34}})));
+    Physiolibrary.Fluid.Sensors.PressureMeasure pressureMeasure(redeclare
+        package Medium =
+                 Physiolibrary.Media.Air)
+      annotation (Placement(transformation(extent={{-6,40},{14,60}})));
+    Physiolibrary.Fluid.Components.Resistor resistor(redeclare package Medium
+        = Physiolibrary.Media.Air,                   Resistance(displayUnit="(cmH2O.s)/l")=
+           147099.75)
+      annotation (Placement(transformation(extent={{-66,54},{-46,74}})));
+    Physiolibrary.Fluid.Sensors.FlowMeasure alveolarVentilationPre(redeclare
+        package Medium = Physiolibrary.Media.Air)
+      annotation (Placement(transformation(extent={{-50,26},{-30,46}})));
+    Physiolibrary.Fluid.Sensors.FlowMeasure totalVentilation(redeclare package
+        Medium = Physiolibrary.Media.Air)
+      annotation (Placement(transformation(extent={{50,58},{70,78}})));
+    Chemical.Components.GasSolubility gasSolubilityO2(KC=1e-6)
+      annotation (Placement(transformation(extent={{-26,-22},{-6,-2}})));
+    Chemical.Components.GasSolubility gasSolubilityCO2
+      annotation (Placement(transformation(extent={{8,-22},{28,-2}})));
+    Chemical.Sources.SubstanceOutflow O2_left(SubstanceFlow(displayUnit=
+            "mmol/min") = 0.00025666666666667) annotation (Placement(
+          transformation(
+          extent={{-10,-10},{10,10}},
+          rotation=180,
+          origin={-56,-36})));
+    Chemical.Sources.SubstanceInflowT CO2_left(
+      SubstanceFlow(displayUnit="mmol/min") = 0.00020566666666667,
+      redeclare package stateOfMatter = Chemical.Interfaces.IdealGas,
+      substanceData=Chemical.Substances.CarbonDioxide_gas()) annotation (
+        Placement(transformation(
+          extent={{-10,-10},{10,10}},
+          rotation=180,
+          origin={62,-38})));
+    Physiolibrary.Fluid.Sensors.PartialPressure pO2(
+      redeclare package stateOfMatter = Chemical.Interfaces.IdealGas,
+      substanceData=Chemical.Substances.Oxygen_gas(),
+      redeclare package Medium = Physiolibrary.Media.Air)
+      annotation (Placement(transformation(extent={{-92,-14},{-72,6}})));
+    Physiolibrary.Fluid.Sensors.PartialPressure pCO2(
+      redeclare package stateOfMatter = Chemical.Interfaces.IdealGas,
+      substanceData=Chemical.Substances.CarbonDioxide_gas(),
+      redeclare package Medium = Physiolibrary.Media.Air) annotation (Placement(
+          transformation(
+          extent={{-10,-10},{10,10}},
+          rotation=180,
+          origin={74,-8})));
+  equation
+    connect(alveolarVentilationPost.q_in, alveolar.q_in[1]) annotation (Line(
+        points={{22,24},{14,24},{14,38},{-20,38},{-20,17.9},{-2.08,17.9}},
+        color={127,0,0},
+        thickness=0.5));
+    connect(pressureMeasure.q_in, alveolar.q_in[2]) annotation (Line(
+        points={{0,44},{0,38},{-20,38},{-20,17.9},{-1.04,17.9}},
+        color={127,0,0},
+        thickness=0.5));
+    connect(inspiredAir.y, resistor.q_in) annotation (Line(
+        points={{-78,66},{-78,64},{-66,64}},
+        color={127,0,0},
+        thickness=0.5));
+    connect(resistor.q_out, deadspace.q_in) annotation (Line(
+        points={{-46,64},{-38,64},{-38,86},{8,86}},
+        color={127,0,0},
+        thickness=0.5));
+    connect(alveolarVentilationPre.q_out, alveolar.q_in[3]) annotation (Line(
+        points={{-30,36},{-20,36},{-20,17.9},{1.11022e-16,17.9}},
+        color={127,0,0},
+        thickness=0.5));
+    connect(alveolarVentilationPre.q_in, resistor.q_out) annotation (Line(
+        points={{-50,36},{-54,36},{-54,50},{-44,50},{-44,54},{-38,54},{-38,64},{-46,
+            64}},
+        color={127,0,0},
+        thickness=0.5));
+    connect(totalVentilation.q_out, totalRespiration.q_in) annotation (Line(
+        points={{70,68},{80,68}},
+        color={127,0,0},
+        thickness=0.5));
+    connect(totalVentilation.q_in, deadspace.q_out) annotation (Line(
+        points={{50,68},{50,86},{28,86}},
+        color={127,0,0},
+        thickness=0.5));
+    connect(alveolarVentilationPost.q_out, totalVentilation.q_in) annotation (
+        Line(
+        points={{42,24},{46,24},{46,62},{44,62},{44,86},{50,86},{50,68}},
+        color={127,0,0},
+        thickness=0.5));
+    connect(alveolar.substances[1], gasSolubilityO2.gas_port) annotation (Line(
+          points={{-8.88178e-16,8},{-8.88178e-16,2},{-10,2},{-10,4},{-16,4},{
+            -16,-2}}, color={158,66,200}));
+    connect(gasSolubilityCO2.gas_port, alveolar.substances[2]) annotation (Line(
+          points={{18,-2},{18,4},{6,4},{6,2},{-8.88178e-16,2},{-8.88178e-16,8}},
+          color={158,66,200}));
+    connect(O2_left.port_a, gasSolubilityO2.liquid_port) annotation (Line(
+          points={{-46,-36},{-20,-36},{-20,-22},{-16,-22}}, color={158,66,200}));
+    connect(CO2_left.port_b, gasSolubilityCO2.liquid_port) annotation (Line(
+          points={{52,-38},{18,-38},{18,-22}}, color={158,66,200}));
+    connect(gasSolubilityO2.liquid_port, pO2.port_a) annotation (Line(points={{
+            -16,-22},{-16,-24},{-48,-24},{-48,-4},{-72,-4}}, color={158,66,200}));
+    connect(pCO2.port_a, gasSolubilityCO2.liquid_port) annotation (Line(points=
+            {{64,-8},{34,-8},{34,-28},{32,-28},{32,-30},{18,-30},{18,-22}},
+          color={158,66,200}));
+    connect(pO2.referenceFluidPort, alveolar.q_in[4]) annotation (Line(
+        points={{-82,-13.8},{-82,-26},{-96,-26},{-96,17.9},{1.04,17.9}},
+        color={127,0,0},
+        thickness=0.5));
+    connect(pCO2.referenceFluidPort, alveolar.q_in[5]) annotation (Line(
+        points={{74,1.8},{74,17.9},{2.08,17.9}},
+        color={127,0,0},
+        thickness=0.5));
+  end BasicRespiration4;
+
+  model BasicRespiration5
+    parameter Physiolibrary.Types.Frequency RR=0.28333333333333
+                                                    "Respiration rate";
+    parameter Physiolibrary.Types.Volume DV=0.00015 "Dead space";
+    parameter Physiolibrary.Types.Volume TV=0.0005
+                                                "Tidal volume"
+    annotation (Icon(coordinateSystem(preserveAspectRatio=false)), Diagram(
+          coordinateSystem(preserveAspectRatio=false)));
+    Physiolibrary.Fluid.Sources.PressureSource inspiredAir(redeclare package
+        Medium = Physiolibrary.Media.Air)
+      annotation (Placement(transformation(extent={{-98,56},{-78,76}})));
+    Physiolibrary.Fluid.Components.VolumePump deadspace(redeclare package
+        Medium =
+          Physiolibrary.Media.Air,                      SolutionFlow=DV*RR)
+      annotation (Placement(transformation(extent={{-10,-10},{10,10}},
+          rotation=0,
+          origin={18,86})));
+    Physiolibrary.Fluid.Sources.VolumeOutflowSource totalRespiration(SolutionFlow=
+         TV*RR, redeclare package Medium = Physiolibrary.Media.Air)
+                annotation (Placement(transformation(extent={{80,58},{100,78}})));
+    Physiolibrary.Fluid.Components.ElasticVessel alveolar(
+      redeclare package Medium = Physiolibrary.Media.Air,
+      useSubstances=true,
+      volume_start(displayUnit="l") = 0.0016,
+      Compliance(displayUnit="ml/mmHg") = 6.0004926067653e-07,
+      ZeroPressureVolume(displayUnit="l") = 0.0013,
+      ExternalPressure(displayUnit="mmHg") = 100791.72488574,
       nPorts=3) annotation (Placement(transformation(extent={{-10,-10},{10,10}},
 
           rotation=90,
@@ -875,23 +1016,51 @@ package Hackathon2021
     Physiolibrary.Fluid.Sensors.FlowMeasure totalVentilation(redeclare package
         Medium = Physiolibrary.Media.Air)
       annotation (Placement(transformation(extent={{50,58},{70,78}})));
-    Physiolibrary.Fluid.Components.ElasticVessel elasticVessel(redeclare
-        package Medium = Physiolibrary.Media.BloodBySiggaardAndersen,
-        useSubstances=true) annotation (Placement(transformation(
+    Chemical.Components.GasSolubility gasSolubilityO2(KC=1e-6)
+      annotation (Placement(transformation(extent={{-26,-22},{-6,-2}})));
+    Chemical.Components.GasSolubility gasSolubilityCO2(KC=1e-6)
+      annotation (Placement(transformation(extent={{8,-22},{28,-2}})));
+    Chemical.Sources.SubstanceOutflow O2_left(SubstanceFlow(displayUnit=
+            "mmol/min") = 0.00025666666666667) annotation (Placement(
+          transformation(
+          extent={{-10,-10},{10,10}},
+          rotation=180,
+          origin={-56,-36})));
+    Chemical.Sources.SubstanceInflowT CO2_left(
+      SubstanceFlow(displayUnit="mmol/min") = 0.00020566666666667,
+      redeclare package stateOfMatter = Chemical.Interfaces.IdealGas,
+      substanceData=Chemical.Substances.CarbonDioxide_gas()) annotation (
+        Placement(transformation(
+          extent={{-10,-10},{10,10}},
+          rotation=180,
+          origin={62,-38})));
+    Physiolibrary.Fluid.Sensors.PartialPressure pO2(
+      redeclare package stateOfMatter = Chemical.Interfaces.IdealGas,
+      substanceData=Chemical.Substances.Oxygen_gas(),
+      redeclare package Medium = Physiolibrary.Media.BloodBySiggaardAndersen)
+      annotation (Placement(transformation(extent={{-92,-14},{-72,6}})));
+    Physiolibrary.Fluid.Sensors.PartialPressure pCO2(
+      redeclare package stateOfMatter = Chemical.Interfaces.IdealGas,
+      substanceData=Chemical.Substances.CarbonDioxide_gas(),
+      redeclare package Medium = Physiolibrary.Media.BloodBySiggaardAndersen)
+      annotation (Placement(transformation(
+          extent={{-10,-10},{10,10}},
+          rotation=180,
+          origin={74,-8})));
+    Physiolibrary.Fluid.Components.ElasticVessel elasticVessel(
+      redeclare package Medium = Physiolibrary.Media.BloodBySiggaardAndersen,
+      useSubstances=true,
+      nPorts=2) annotation (Placement(transformation(
           extent={{-10,-10},{10,10}},
           rotation=270,
-          origin={-2,-44})));
-    Chemical.Components.GasSolubility gasSolubilityO2
-      annotation (Placement(transformation(extent={{-26,-22},{-6,-2}})));
-    Chemical.Components.GasSolubility gasSolubilityCO2
-      annotation (Placement(transformation(extent={{8,-22},{28,-2}})));
+          origin={0,-72})));
   equation
     connect(alveolarVentilationPost.q_in, alveolar.q_in[1]) annotation (Line(
         points={{22,24},{14,24},{14,38},{-20,38},{-20,17.9},{-1.73333,17.9}},
         color={127,0,0},
         thickness=0.5));
     connect(pressureMeasure.q_in, alveolar.q_in[2]) annotation (Line(
-        points={{0,44},{0,38},{-20,38},{-20,17.9},{-1.66533e-16,17.9}},
+        points={{0,44},{0,38},{-20,38},{-20,17.9},{-1.11022e-16,17.9}},
         color={127,0,0},
         thickness=0.5));
     connect(inspiredAir.y, resistor.q_in) annotation (Line(
@@ -927,16 +1096,220 @@ package Hackathon2021
     connect(alveolar.substances[1], gasSolubilityO2.gas_port) annotation (Line(
           points={{-8.88178e-16,8},{-8.88178e-16,2},{-10,2},{-10,4},{-16,4},{
             -16,-2}}, color={158,66,200}));
-    connect(gasSolubilityO2.liquid_port, elasticVessel.substances[2])
-      annotation (Line(points={{-16,-22},{-16,-26},{0,-26},{0,-30},{-2,-30},{-2,
-            -34}}, color={158,66,200}));
     connect(gasSolubilityCO2.gas_port, alveolar.substances[2]) annotation (Line(
           points={{18,-2},{18,4},{6,4},{6,2},{-8.88178e-16,2},{-8.88178e-16,8}},
           color={158,66,200}));
-    connect(gasSolubilityCO2.liquid_port, elasticVessel.substances[3])
-      annotation (Line(points={{18,-22},{18,-28},{0,-28},{0,-30},{-2,-30},{-2,
-            -34}}, color={158,66,200}));
-  end BasicRespiration4;
+    connect(O2_left.port_a, gasSolubilityO2.liquid_port) annotation (Line(
+          points={{-46,-36},{-20,-36},{-20,-22},{-16,-22}}, color={158,66,200}));
+    connect(CO2_left.port_b, gasSolubilityCO2.liquid_port) annotation (Line(
+          points={{52,-38},{18,-38},{18,-22}}, color={158,66,200}));
+    connect(gasSolubilityO2.liquid_port, pO2.port_a) annotation (Line(points={{
+            -16,-22},{-16,-24},{-48,-24},{-48,-4},{-72,-4}}, color={158,66,200}));
+    connect(pCO2.port_a, gasSolubilityCO2.liquid_port) annotation (Line(points=
+            {{64,-8},{34,-8},{34,-28},{32,-28},{32,-30},{18,-30},{18,-22}},
+          color={158,66,200}));
+    connect(elasticVessel.substances[2], gasSolubilityO2.liquid_port)
+      annotation (Line(points={{1.9984e-15,-62},{1.9984e-15,-26},{-16,-26},{-16,
+            -22}}, color={158,66,200}));
+    connect(elasticVessel.substances[3], gasSolubilityCO2.liquid_port)
+      annotation (Line(points={{1.9984e-15,-62},{1.9984e-15,-28},{18,-28},{18,
+            -22}}, color={158,66,200}));
+    connect(pO2.referenceFluidPort, elasticVessel.q_in[1]) annotation (Line(
+        points={{-82,-13.8},{-82,-71.9},{1.3,-71.9}},
+        color={127,0,0},
+        thickness=0.5));
+    connect(pCO2.referenceFluidPort, elasticVessel.q_in[2]) annotation (Line(
+        points={{74,1.8},{84,1.8},{84,2},{96,2},{96,-71.9},{-1.3,-71.9}},
+        color={127,0,0},
+        thickness=0.5));
+  end BasicRespiration5;
+
+  model BasicRespiration6
+    parameter Physiolibrary.Types.Frequency RR=0.28333333333333
+                                                    "Respiration rate";
+    parameter Physiolibrary.Types.Volume DV=0.00015 "Dead space";
+    parameter Physiolibrary.Types.Volume TV=0.0005
+                                                "Tidal volume"
+    annotation (Icon(coordinateSystem(preserveAspectRatio=false)), Diagram(
+          coordinateSystem(preserveAspectRatio=false)));
+    Physiolibrary.Fluid.Sources.PressureSource inspiredAir(redeclare package
+        Medium = Physiolibrary.Media.Air)
+      annotation (Placement(transformation(extent={{-98,56},{-78,76}})));
+    Physiolibrary.Fluid.Components.VolumePump deadspace(redeclare package
+        Medium =
+          Physiolibrary.Media.Air,                      SolutionFlow=DV*RR)
+      annotation (Placement(transformation(extent={{-10,-10},{10,10}},
+          rotation=0,
+          origin={18,86})));
+    Physiolibrary.Fluid.Sources.VolumeOutflowSource totalRespiration(SolutionFlow=
+         TV*RR, redeclare package Medium = Physiolibrary.Media.Air)
+                annotation (Placement(transformation(extent={{80,58},{100,78}})));
+    Physiolibrary.Fluid.Components.ElasticVessel alveolar(
+      redeclare package Medium = Physiolibrary.Media.Air,
+      useSubstances=true,
+      volume_start(displayUnit="l") = 0.0016,
+      Compliance(displayUnit="ml/mmHg") = 6.0004926067653e-07,
+      ZeroPressureVolume(displayUnit="l") = 0.0013,
+      ExternalPressure(displayUnit="mmHg") = 100791.72488574,
+      nPorts=4) annotation (Placement(transformation(extent={{-10,-10},{10,10}},
+
+          rotation=90,
+          origin={0,14})));
+    Physiolibrary.Fluid.Sensors.FlowMeasure alveolarVentilationPost(redeclare
+        package Medium = Physiolibrary.Media.Air)
+      annotation (Placement(transformation(extent={{22,14},{42,34}})));
+    Physiolibrary.Fluid.Sensors.PressureMeasure pressureMeasure(redeclare
+        package Medium =
+                 Physiolibrary.Media.Air)
+      annotation (Placement(transformation(extent={{-6,40},{14,60}})));
+    Physiolibrary.Fluid.Components.Resistor resistor(redeclare package Medium
+        = Physiolibrary.Media.Air,                   Resistance(displayUnit="(cmH2O.s)/l")=
+           147099.75)
+      annotation (Placement(transformation(extent={{-66,54},{-46,74}})));
+    Physiolibrary.Fluid.Sensors.FlowMeasure alveolarVentilationPre(redeclare
+        package Medium = Physiolibrary.Media.Air)
+      annotation (Placement(transformation(extent={{-50,26},{-30,46}})));
+    Physiolibrary.Fluid.Sensors.FlowMeasure totalVentilation(redeclare package
+        Medium = Physiolibrary.Media.Air)
+      annotation (Placement(transformation(extent={{50,58},{70,78}})));
+    Chemical.Components.GasSolubility gasSolubilityO2(KC=1e-4)
+      annotation (Placement(transformation(extent={{-26,-26},{-6,-6}})));
+    Chemical.Components.GasSolubility gasSolubilityCO2(KC=1e-4)
+      annotation (Placement(transformation(extent={{8,-26},{28,-6}})));
+    Chemical.Sources.SubstanceOutflow O2_left(SubstanceFlow(displayUnit=
+            "mmol/min") = 0.00025666666666667) annotation (Placement(
+          transformation(
+          extent={{-10,-10},{10,10}},
+          rotation=180,
+          origin={-56,-40})));
+    Chemical.Sources.SubstanceInflowT CO2_left(
+      SubstanceFlow(displayUnit="mmol/min") = 0.00020566666666667,
+      redeclare package stateOfMatter = Chemical.Interfaces.IdealGas,
+      substanceData=Chemical.Substances.CarbonDioxide_gas()) annotation (
+        Placement(transformation(
+          extent={{-10,-10},{10,10}},
+          rotation=180,
+          origin={62,-42})));
+    Physiolibrary.Fluid.Sensors.PartialPressure pO2_blood(
+      redeclare package stateOfMatter = Chemical.Interfaces.IdealGas,
+      substanceData=Chemical.Substances.Oxygen_gas(),
+      redeclare package Medium = Physiolibrary.Media.BloodBySiggaardAndersen)
+      annotation (Placement(transformation(extent={{-92,-36},{-72,-16}})));
+    Physiolibrary.Fluid.Sensors.PartialPressure pCO2_blood(
+      redeclare package stateOfMatter = Chemical.Interfaces.IdealGas,
+      substanceData=Chemical.Substances.CarbonDioxide_gas(),
+      redeclare package Medium = Physiolibrary.Media.BloodBySiggaardAndersen)
+      annotation (Placement(transformation(
+          extent={{-10,-10},{10,10}},
+          rotation=180,
+          origin={78,-20})));
+    Physiolibrary.Fluid.Components.ElasticVessel elasticVessel(
+      redeclare package Medium = Physiolibrary.Media.BloodBySiggaardAndersen,
+      useSubstances=true,
+      nPorts=2) annotation (Placement(transformation(
+          extent={{-10,-10},{10,10}},
+          rotation=270,
+          origin={0,-76})));
+    Physiolibrary.Fluid.Sensors.PartialPressure pO2_alveoli(
+      redeclare package stateOfMatter = Chemical.Interfaces.IdealGas,
+      substanceData=Chemical.Substances.Oxygen_gas(),
+      redeclare package Medium = Physiolibrary.Media.Air)
+      annotation (Placement(transformation(extent={{-94,16},{-74,36}})));
+    Physiolibrary.Fluid.Sensors.PartialPressure pCO2_alveoli(
+      redeclare package stateOfMatter = Chemical.Interfaces.IdealGas,
+      substanceData=Chemical.Substances.CarbonDioxide_gas(),
+      redeclare package Medium = Physiolibrary.Media.Air) annotation (Placement(
+          transformation(
+          extent={{-10,-10},{10,10}},
+          rotation=180,
+          origin={72,26})));
+  equation
+    connect(alveolarVentilationPost.q_in, alveolar.q_in[1]) annotation (Line(
+        points={{22,24},{14,24},{14,38},{-20,38},{-20,13.9},{-1.95,13.9}},
+        color={127,0,0},
+        thickness=0.5));
+    connect(pressureMeasure.q_in, alveolar.q_in[2]) annotation (Line(
+        points={{0,44},{0,38},{-20,38},{-20,13.9},{-0.65,13.9}},
+        color={127,0,0},
+        thickness=0.5));
+    connect(inspiredAir.y, resistor.q_in) annotation (Line(
+        points={{-78,66},{-78,64},{-66,64}},
+        color={127,0,0},
+        thickness=0.5));
+    connect(resistor.q_out, deadspace.q_in) annotation (Line(
+        points={{-46,64},{-38,64},{-38,86},{8,86}},
+        color={127,0,0},
+        thickness=0.5));
+    connect(alveolarVentilationPre.q_out, alveolar.q_in[3]) annotation (Line(
+        points={{-30,36},{-20,36},{-20,13.9},{0.65,13.9}},
+        color={127,0,0},
+        thickness=0.5));
+    connect(alveolarVentilationPre.q_in, resistor.q_out) annotation (Line(
+        points={{-50,36},{-54,36},{-54,50},{-44,50},{-44,54},{-38,54},{-38,64},{-46,
+            64}},
+        color={127,0,0},
+        thickness=0.5));
+    connect(totalVentilation.q_out, totalRespiration.q_in) annotation (Line(
+        points={{70,68},{80,68}},
+        color={127,0,0},
+        thickness=0.5));
+    connect(totalVentilation.q_in, deadspace.q_out) annotation (Line(
+        points={{50,68},{50,86},{28,86}},
+        color={127,0,0},
+        thickness=0.5));
+    connect(alveolarVentilationPost.q_out, totalVentilation.q_in) annotation (
+        Line(
+        points={{42,24},{46,24},{46,62},{44,62},{44,86},{50,86},{50,68}},
+        color={127,0,0},
+        thickness=0.5));
+    connect(alveolar.substances[1], gasSolubilityO2.gas_port) annotation (Line(
+          points={{-8.88178e-16,4},{-8.88178e-16,2},{-10,2},{-10,4},{-16,4},{
+            -16,-6}}, color={158,66,200}));
+    connect(gasSolubilityCO2.gas_port, alveolar.substances[2]) annotation (Line(
+          points={{18,-6},{18,4},{6,4},{6,2},{-8.88178e-16,2},{-8.88178e-16,4}},
+          color={158,66,200}));
+    connect(O2_left.port_a, gasSolubilityO2.liquid_port) annotation (Line(
+          points={{-46,-40},{-20,-40},{-20,-26},{-16,-26}}, color={158,66,200}));
+    connect(CO2_left.port_b, gasSolubilityCO2.liquid_port) annotation (Line(
+          points={{52,-42},{18,-42},{18,-26}}, color={158,66,200}));
+    connect(gasSolubilityO2.liquid_port, pO2_blood.port_a) annotation (Line(
+          points={{-16,-26},{-20,-26},{-20,-40},{-40,-40},{-40,-26},{-72,-26}},
+          color={158,66,200}));
+    connect(pCO2_blood.port_a, gasSolubilityCO2.liquid_port) annotation (Line(
+          points={{68,-20},{34,-20},{34,-32},{32,-32},{32,-34},{18,-34},{18,-26}},
+          color={158,66,200}));
+    connect(elasticVessel.substances[2], gasSolubilityO2.liquid_port)
+      annotation (Line(points={{1.9984e-15,-66},{1.9984e-15,-30},{-16,-30},{-16,
+            -26}}, color={158,66,200}));
+    connect(elasticVessel.substances[3], gasSolubilityCO2.liquid_port)
+      annotation (Line(points={{1.9984e-15,-66},{1.9984e-15,-32},{18,-32},{18,
+            -26}}, color={158,66,200}));
+    connect(pO2_blood.referenceFluidPort, elasticVessel.q_in[1]) annotation (
+        Line(
+        points={{-82,-35.8},{-82,-90},{12,-90},{12,-75.9},{1.3,-75.9}},
+        color={127,0,0},
+        thickness=0.5));
+    connect(pCO2_blood.referenceFluidPort, elasticVessel.q_in[2]) annotation (
+        Line(
+        points={{78,-10.2},{84,-10.2},{84,-2},{96,-2},{96,-75.9},{-1.3,-75.9}},
+
+        color={127,0,0},
+        thickness=0.5));
+    connect(pO2_alveoli.referenceFluidPort, alveolar.q_in[4]) annotation (Line(
+        points={{-84,16.2},{-84,10},{-20,10},{-20,13.9},{1.95,13.9}},
+        color={127,0,0},
+        thickness=0.5));
+    connect(pCO2_alveoli.referenceFluidPort, alveolarVentilationPost.q_in)
+      annotation (Line(
+        points={{72,35.8},{64,35.8},{64,36},{52,36},{52,14},{22,14},{22,24}},
+        color={127,0,0},
+        thickness=0.5));
+    connect(pCO2_alveoli.port_a, gasSolubilityCO2.gas_port) annotation (Line(
+          points={{62,26},{62,4},{18,4},{18,-6}}, color={158,66,200}));
+    connect(pO2_alveoli.port_a, gasSolubilityO2.gas_port) annotation (Line(
+          points={{-74,26},{-66,26},{-66,6},{-16,6},{-16,-6}}, color={158,66,
+            200}));
+  end BasicRespiration6;
   annotation (uses(Physiolibrary(version="3.0.0-alpha7"), Modelica(version=
             "4.0.0"),
       Chemical(version="1.4.0-alpha7")));
