@@ -12,13 +12,13 @@ package ModelicaHackathonPoriz
                                             "Tidal volume";
     parameter Physiolibrary.Types.Volume DV=0.00015
                                             "Deadspace volume";
-    parameter Physiolibrary.Types.HydraulicConductance C_totalVentilation=1.019716212977928e-05*(1/1.5)
+    parameter Physiolibrary.Types.HydraulicConductance C_totalVentilation(displayUnit="l/(cmH2O.s)")=1.019716212977928e-05*(1/1.5)
                                                          "Total lung conductance";
 
-    parameter Physiolibrary.Types.HydraulicConductance C_totalPerfusion=1.250102626409427e-10*(1/3*(1 - 0.02))
+    parameter Physiolibrary.Types.HydraulicConductance C_totalPerfusion(displayUnit="l/(mmHg.min)")=1.250102626409427e-07*(1/3*(1 - 0.02))
                                                          "Total conductance of pulmonary ventilated blood vessels";
 
-     parameter Physiolibrary.Types.HydraulicConductance C_shunt=1.250102626409427e-10*(1/3*0.02)
+     parameter Physiolibrary.Types.HydraulicConductance C_shunt(displayUnit="l/(mmHg.min)")=1.250102626409427e-07*(1/3*(0.02))
                                                      "Hydraulic conductance of pulmonary circulation shunt";
 
     parameter Integer NumberOfAlveolarUnits=2 "Number of alveolus";
@@ -153,7 +153,7 @@ package ModelicaHackathonPoriz
           transformation(rotation=0, extent={{-14,174},{6,194}})));
     Physiolibrary.Fluid.Components.Conductor shunt(redeclare package Medium = Physiolibrary.Media.BloodBySiggaardAndersen,
                                                    Conductance=C_shunt)
-      annotation (Placement(transformation(extent={{-10,102},{10,122}})));
+      annotation (Placement(transformation(extent={{-8,106},{12,126}})));
   equation
     connect(left_heart.q_in, pulmonary_veins.q_in[1]) annotation (Line(
         points={{62,4},{62,65.95},{59.9,65.95}},
@@ -248,11 +248,11 @@ package ModelicaHackathonPoriz
         color={127,0,0},
         thickness=0.5));
     connect(shunt.q_in, pulmonary_arteries.q_in[3]) annotation (Line(
-        points={{-10,112},{-18,112},{-18,52},{-60.1,52},{-60.1,65.35}},
+        points={{-8,116},{-18,116},{-18,52},{-60.1,52},{-60.1,65.35}},
         color={127,0,0},
         thickness=0.5));
     connect(shunt.q_out, pulmonary_veins.q_in[3]) annotation (Line(
-        points={{10,112},{20,112},{20,62},{50,62},{50,63.35},{59.9,63.35}},
+        points={{12,116},{20,116},{20,62},{50,62},{50,63.35},{59.9,63.35}},
         color={127,0,0},
         thickness=0.5));
 
