@@ -1,5 +1,17 @@
 within ;
 model spojeni
+  replaceable package Blood =
+        Physiolibrary.Media.BloodBySiggaardAndersen annotation(choicesAllMatching=True);
+    replaceable package Air =
+        Physiolibrary.Media.Air annotation(choicesAllMatching=True);
+
+    parameter Physiolibrary.Types.Frequency RR=0.286
+                                                "Respiration rate";
+    parameter Physiolibrary.Types.Volume TV=0.0005
+                                                "Tidal volume";
+    parameter Physiolibrary.Types.Volume DV=0.00015
+                                                 "Dead space volume";
+
   Physiolibrary.Fluid.Sources.PressureSource pressureSource(redeclare package
       Medium = Physiolibrary.Media.Air)
     annotation (Placement(transformation(extent={{-106,72},{-86,92}})));
@@ -31,7 +43,7 @@ model spojeni
       = Physiolibrary.Media.Air)
     annotation (Placement(transformation(extent={{-40,54},{-20,74}})));
   Physiolibrary.Fluid.Components.Conductor conductor(redeclare package Medium
-      = Physiolibrary.Media.Air, Conductance(displayUnit="l/(cmH2O.s)") =
+      = Physiolibrary.Media.Air, Conductance(displayUnit="l/(cmH2O.s)")=
       1.019716212977928e-05*(1/1.5))
     annotation (Placement(transformation(extent={{-10,-10},{10,10}},
         rotation=0,
@@ -40,20 +52,6 @@ model spojeni
     annotation (Placement(transformation(extent={{-26,8},{-6,28}})));
   Chemical.Components.GasSolubility CO2(KC=1e-4)
     annotation (Placement(transformation(extent={{8,6},{28,26}})));
-  Chemical.Sources.SubstanceOutflow O2_left(useSubstanceFlowInput=false,
-      SubstanceFlow(displayUnit="mmol/min") = 0.00025666666666667) annotation (
-      Placement(transformation(
-        extent={{-10,-10},{10,10}},
-        rotation=180,
-        origin={-62,-6})));
-  Chemical.Sources.SubstanceInflowT CO2_left(
-    SubstanceFlow(displayUnit="mmol/min") = 0.00020566666666667,
-    redeclare package stateOfMatter = Chemical.Interfaces.IdealGas,
-    substanceData=Chemical.Substances.CarbonDioxide_gas()) annotation (
-      Placement(transformation(
-        extent={{-10,-10},{10,10}},
-        rotation=180,
-        origin={56,-4})));
   Physiolibrary.Fluid.Sensors.PartialPressure pO2(
     redeclare package stateOfMatter = Chemical.Interfaces.IdealGas,
     substanceData=Chemical.Substances.Oxygen_gas(),
@@ -160,7 +158,7 @@ model spojeni
     volume_start(displayUnit="l") = 0.0003,
     Compliance(displayUnit="ml/mmHg") = 3.0002463033826e-08,
     ZeroPressureVolume(displayUnit="l") = 0.0002,
-    nPorts=2) annotation (Placement(transformation(
+    nPorts=5) annotation (Placement(transformation(
         extent={{-10,-10},{10,10}},
         rotation=90,
         origin={16,-278})));
@@ -173,7 +171,7 @@ model spojeni
     volume_start(displayUnit="l") = 0.00015,
     Compliance(displayUnit="ml/mmHg") = 3.0002463033826e-08,
     ZeroPressureVolume(displayUnit="l") = 0.0001,
-    nPorts=2) annotation (Placement(transformation(
+    nPorts=4) annotation (Placement(transformation(
         extent={{-10,-10},{10,10}},
         rotation=270,
         origin={16,-62})));
@@ -197,6 +195,19 @@ model spojeni
         extent={{-10,-10},{10,10}},
         rotation=180,
         origin={-64,-280})));
+  Physiolibrary.Fluid.Sensors.PartialPressure pO2_tissue(
+    redeclare package stateOfMatter = Chemical.Interfaces.IdealGas,
+    substanceData=Chemical.Substances.Oxygen_gas(),
+    redeclare package Medium = Physiolibrary.Media.BloodBySiggaardAndersen)
+    annotation (Placement(transformation(extent={{-66,-336},{-46,-316}})));
+  Physiolibrary.Fluid.Sensors.PartialPressure pCO2_tissue(
+    redeclare package stateOfMatter = Chemical.Interfaces.IdealGas,
+    substanceData=Chemical.Substances.CarbonDioxide_gas(),
+    redeclare package Medium = Physiolibrary.Media.BloodBySiggaardAndersen)
+    annotation (Placement(transformation(
+        extent={{-10,-10},{10,10}},
+        rotation=0,
+        origin={92,-334})));
 equation
   connect(volumePump.q_out,volumeOutflowSource. q_in) annotation (Line(
       points={{10,96},{72,96},{72,84},{80,84}},
@@ -235,14 +246,6 @@ equation
                                            color={158,66,200}));
   connect(Alveoly.substances[2],CO2. gas_port) annotation (Line(points={{0,50},{
           2,50},{2,40},{18,40},{18,26}}, color={158,66,200}));
-  connect(pO2.port_a,O2_left. port_a) annotation (Line(points={{-60,24},{-52,24},
-          {-52,20},{-34,20},{-34,-6},{-52,-6}},          color={158,66,200}));
-  connect(pCO2.port_a,CO2_left. port_b) annotation (Line(points={{88,16},{90,16},
-          {90,32},{38,32},{38,-4},{46,-4}},        color={158,66,200}));
-  connect(O2.liquid_port,O2_left. port_a) annotation (Line(points={{-16,8},{-16,
-          -6},{-52,-6}},       color={158,66,200}));
-  connect(CO2.liquid_port, CO2_left.port_b)
-    annotation (Line(points={{18,6},{18,-4},{46,-4}}, color={158,66,200}));
   connect(srdceP.q_out,PlicArterie. q_in[1]) annotation (Line(
       points={{-56,-146},{-58,-146},{-58,-90.2667},{-52.1,-90.2667}},
       color={127,0,0},
@@ -305,10 +308,6 @@ equation
       points={{52,-222},{81.9,-222},{81.9,-220.907}},
       color={127,0,0},
       thickness=0.5));
-  connect(resistor1.q_out,resistor2. q_in) annotation (Line(
-      points={{32,-222},{20,-222},{20,-224},{2,-224},{2,-222}},
-      color={127,0,0},
-      thickness=0.5));
   connect(resistor.q_in,PlicArterie. q_in[3]) annotation (Line(
       points={{-20,-90},{-32,-90},{-32,-93.7333},{-52.1,-93.7333}},
       color={127,0,0},
@@ -318,23 +317,15 @@ equation
       color={127,0,0},
       thickness=0.5));
   connect(elasticVessel.q_in[1],resistor2. q_in) annotation (Line(
-      points={{14.7,-278.1},{14.7,-222},{2,-222}},
-      color={127,0,0},
-      thickness=0.5));
-  connect(resistor.q_out,resistor3. q_in) annotation (Line(
-      points={{0,-90},{30,-90},{30,-88}},
+      points={{13.92,-278.1},{13.92,-222},{2,-222}},
       color={127,0,0},
       thickness=0.5));
   connect(TlakKapilaryTelo.q_in,elasticVessel. q_in[2]) annotation (Line(
-      points={{-16,-260},{-16,-266},{17.3,-266},{17.3,-278.1}},
+      points={{-16,-260},{-16,-266},{14.96,-266},{14.96,-278.1}},
       color={127,0,0},
       thickness=0.5));
   connect(TlakKapilaryPlice.q_in,elasticVessel1. q_in[1]) annotation (Line(
-      points={{56,-62},{17.3,-61.9}},
-      color={127,0,0},
-      thickness=0.5));
-  connect(elasticVessel1.q_in[2], resistor3.q_in) annotation (Line(
-      points={{14.7,-61.9},{14.7,-90},{30,-90},{30,-88}},
+      points={{56,-62},{17.95,-61.9}},
       color={127,0,0},
       thickness=0.5));
   connect(O2.liquid_port, elasticVessel1.substances[2])
@@ -344,13 +335,53 @@ equation
   connect(CO2_left1.port_b, elasticVessel.substances[3]) annotation (Line(
         points={{74,-292},{56,-292},{56,-286},{16,-286},{16,-288}}, color={158,
           66,200}));
-  connect(O2_left1.port_a, elasticVessel.substances[2]) annotation (Line(points
-        ={{-54,-280},{16,-280},{16,-288}}, color={158,66,200}));
+  connect(O2_left1.port_a, elasticVessel.substances[2]) annotation (Line(points=
+         {{-54,-280},{16,-280},{16,-288}}, color={158,66,200}));
+  connect(pO2.referenceFluidPort, elasticVessel1.q_in[2]) annotation (Line(
+      points={{-70,14.2},{-72,14.2},{-72,24},{-70,24},{-70,-30},{-72,-30},{-72,
+          -61.9},{16.65,-61.9}},
+      color={127,0,0},
+      thickness=0.5));
+  connect(pCO2.referenceFluidPort, elasticVessel1.q_in[2]) annotation (Line(
+      points={{78,6.2},{78,-40},{34,-40},{34,-61.9},{16.65,-61.9}},
+      color={127,0,0},
+      thickness=0.5));
+  connect(O2.liquid_port, pO2.port_a) annotation (Line(points={{-16,8},{-16,-14},
+          {-38,-14},{-38,24},{-60,24}}, color={158,66,200}));
+  connect(CO2.liquid_port, pCO2.port_a) annotation (Line(points={{18,6},{16,6},{
+          16,-12},{52,-12},{52,16},{88,16}}, color={158,66,200}));
+  connect(O2_left1.port_a, pO2_tissue.port_a) annotation (Line(points={{-54,-280},
+          {-32,-280},{-32,-326},{-46,-326}}, color={158,66,200}));
+  connect(pO2_tissue.referenceFluidPort, elasticVessel.q_in[3]) annotation (
+      Line(
+      points={{-56,-335.8},{-44,-335.8},{-44,-330},{4,-330},{4,-266},{14,-266},
+          {14,-274},{16,-274},{16,-278.1}},
+      color={127,0,0},
+      thickness=0.5));
+  connect(pCO2_tissue.referenceFluidPort, elasticVessel.q_in[4]) annotation (
+      Line(
+      points={{92,-343.8},{17.04,-343.8},{17.04,-278.1}},
+      color={127,0,0},
+      thickness=0.5));
+  connect(CO2_left1.port_b, pCO2_tissue.port_a) annotation (Line(points={{74,-292},
+          {56,-292},{56,-334},{102,-334}}, color={158,66,200}));
+  connect(resistor.q_out, elasticVessel1.q_in[3]) annotation (Line(
+      points={{0,-90},{15.35,-90},{15.35,-61.9}},
+      color={127,0,0},
+      thickness=0.5));
+  connect(resistor3.q_in, elasticVessel1.q_in[4]) annotation (Line(
+      points={{30,-88},{18,-88},{18,-61.9},{14.05,-61.9}},
+      color={127,0,0},
+      thickness=0.5));
+  connect(resistor1.q_out, elasticVessel.q_in[5]) annotation (Line(
+      points={{32,-222},{18.08,-222},{18.08,-278.1}},
+      color={127,0,0},
+      thickness=0.5));
   annotation (
     uses(
-      Physiolibrary(version="3.0.0-alpha7"),
-      Chemical(version="1.4.0-alpha7"),
-      Modelica(version="4.0.0")),
+      Modelica(version="4.0.0"),
+      Physiolibrary(version="3.0.0-alpha8"),
+      Chemical(version="1.4.0")),
     Diagram(coordinateSystem(extent={{-200,-400},{240,100}})),
     Icon(coordinateSystem(extent={{-200,-400},{240,100}})));
 end spojeni;
