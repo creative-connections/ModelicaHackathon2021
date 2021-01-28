@@ -104,9 +104,11 @@ package Hackathon
     Physiolibrary.Fluid.Interfaces.FluidPort_a PulmoCapillariesIn(redeclare
         package Medium = Blood) annotation (Placement(transformation(rotation=0,
             extent={{-53.5,88},{-28.5,108}})));
-    Physiolibrary.Fluid.Interfaces.FluidPort_b PulmoCapillariesOut
+    Physiolibrary.Fluid.Interfaces.FluidPort_b PulmoCapillariesOut(redeclare
+        package Medium = Physiolibrary.Media.BloodBySiggaardAndersen)
       annotation (Placement(transformation(extent={{-14,88},{6,108}})));
-    Physiolibrary.Fluid.Interfaces.FluidPort_b SystemicCapillariesIn
+    Physiolibrary.Fluid.Interfaces.FluidPort_b SystemicCapillariesIn(redeclare
+        package Medium = Physiolibrary.Media.BloodBySiggaardAndersen)
       annotation (Placement(transformation(extent={{-74,-110},{-54,-90}})));
   equation
     connect(LeftHeart.q_in,VeinsPulmo. q_in[1]) annotation (Line(
@@ -252,9 +254,12 @@ package Hackathon
           extent={{-10,-10},{10,10}},
           rotation=270,
           origin={0,-60})));
-    Physiolibrary.Fluid.Components.Resistor PulmonaryRes(Resistance=
-          7999343.2449*(3*(7/8)))
-      annotation (Placement(transformation(extent={{-44,-100},{-24,-80}})));
+    Physiolibrary.Fluid.Components.Resistor PulmonaryRes(redeclare package
+        Medium = Physiolibrary.Media.BloodBySiggaardAndersen, Resistance=
+          7999343.2449*(3*(7/8))) annotation (Placement(transformation(
+          extent={{-10,-10},{10,10}},
+          rotation=180,
+          origin={-34,-90})));
     Physiolibrary.Fluid.Components.Resistor systemicRes(redeclare package
         Medium = Physiolibrary.Media.BloodBySiggaardAndersen, Resistance=
           7999343.2449*(20*(7/8)))
@@ -325,10 +330,6 @@ package Hackathon
     connect(CO2.liquid_port, pCO2.port_a) annotation (Line(points={{18,-10},{18,
             -22},{86,-22},{86,-2},{80,-2}},
                                      color={158,66,200}));
-    connect(PulmonaryRes.q_in, PulmoCapillaries.q_in[3]) annotation (Line(
-        points={{-44,-90},{-50,-90},{-50,-59.9},{-0.65,-59.9}},
-        color={127,0,0},
-        thickness=0.5));
     connect(systemicRes.q_out, SystemCapillaries.q_in[1]) annotation (Line(
         points={{54,-128},{78,-128},{78,-148.7},{-22.1,-148.7}},
         color={127,0,0},
@@ -338,14 +339,9 @@ package Hackathon
     connect(CO2Production.port_b, SystemCapillaries.substances[3]) annotation (
         Line(points={{36,-186},{-40,-186},{-40,-150},{-32,-150}}, color={158,66,
             200}));
-    connect(circulation2_1.PulmoCapillariesIn, PulmonaryRes.q_out) annotation (
-        Line(
-        points={{1.504,-96.2},{1.504,-90},{-24,-90}},
-        color={127,0,0},
-        thickness=0.5));
-    connect(circulation2_1.PulmoCapillariesOut, PulmoCapillaries.q_in[4])
+    connect(circulation2_1.PulmoCapillariesOut, PulmoCapillaries.q_in[3])
       annotation (Line(
-        points={{5.056,-96.2},{5.056,-82},{-1.95,-82},{-1.95,-59.9}},
+        points={{5.056,-96.2},{5.056,-82},{-0.65,-82},{-0.65,-59.9}},
         color={127,0,0},
         thickness=0.5));
     connect(circulation2_1.SystemicCapOut, systemicRes.q_in) annotation (Line(
@@ -355,6 +351,16 @@ package Hackathon
     connect(circulation2_1.SystemicCapillariesIn, SystemCapillaries.q_in[2])
       annotation (Line(
         points={{-0.704,-116},{0,-116},{0,-124},{-22.1,-124},{-22.1,-151.3}},
+        color={127,0,0},
+        thickness=0.5));
+    connect(circulation2_1.PulmoCapillariesIn, PulmonaryRes.q_in) annotation (
+        Line(
+        points={{1.504,-96.2},{1.504,-90},{-24,-90}},
+        color={127,0,0},
+        thickness=0.5));
+    connect(PulmonaryRes.q_out, PulmoCapillaries.q_in[4]) annotation (Line(
+        points={{-44,-90},{-50,-90},{-50,-88},{-56,-88},{-56,-59.9},{-1.95,
+            -59.9}},
         color={127,0,0},
         thickness=0.5));
     annotation (Icon(coordinateSystem(preserveAspectRatio=false, extent={{-280,
