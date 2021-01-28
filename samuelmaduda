@@ -1,0 +1,187 @@
+model Circulation2
+  Physiolibrary.Fluid.Components.VolumePump LeftHeart(
+    redeclare package Medium = Blood,
+    useSolutionFlowInput=true,
+    SolutionFlow(displayUnit="l/min") = 8.3333333333333e-05) annotation (
+      Placement(transformation(
+        extent={{-10,-10},{10,10}},
+        rotation=270,
+        origin={48,10})));
+  Physiolibrary.Fluid.Components.VolumePump RightHeart(
+    redeclare package Medium = Blood,
+    useSolutionFlowInput=true,
+    SolutionFlow(displayUnit="l/min") = 8.3333333333333e-05) annotation (
+      Placement(transformation(
+        extent={{-10,-10},{10,10}},
+        rotation=90,
+        origin={-74,8})));
+  Physiolibrary.Fluid.Components.ElasticVessel VeinsPulmo(
+    redeclare package Medium = Blood,
+    volume_start(displayUnit="l") = 0.0004,
+    Compliance(displayUnit="ml/mmHg") = 7.5006157584566e-08,
+    ZeroPressureVolume(displayUnit="l") = 0.0004,
+    nPorts=3) annotation (Placement(transformation(extent={{38,56},{58,76}})));
+  Physiolibrary.Fluid.Components.ElasticVessel ArteriesPulmo(
+    redeclare package Medium = Blood,
+    volume_start(displayUnit="l") = 0.00038,
+    Compliance(displayUnit="ml/mmHg") = 3.6002955640592e-08,
+    ZeroPressureVolume(displayUnit="l") = 0.0003,
+    nPorts=3) annotation (Placement(transformation(extent={{-84,58},{-64,78}})));
+  Physiolibrary.Fluid.Components.ElasticVessel ArteriesBody(
+    redeclare package Medium = Blood,
+    volume_start(displayUnit="l") = 0.00085,
+    Compliance(displayUnit="ml/mmHg") = 2.6627185942521e-08,
+    ZeroPressureVolume(displayUnit="l") = 0.00045,
+    nPorts=3) annotation (Placement(transformation(extent={{38,-58},{58,-38}})));
+  Physiolibrary.Fluid.Components.ElasticVessel VeinsBody(
+    redeclare package Medium = Blood,
+    volume_start(displayUnit="l") = 0.00325,
+    Compliance(displayUnit="ml/mmHg") = 6.1880080007267e-07,
+    ZeroPressureVolume(displayUnit="l") = 0.00295,
+    nPorts=3)
+    annotation (Placement(transformation(extent={{-84,-56},{-64,-36}})));
+  Physiolibrary.Fluid.Sensors.FlowMeasure flowRight(redeclare package Medium =
+        Blood) annotation (Placement(transformation(
+        extent={{-10,-10},{10,10}},
+        rotation=270,
+        origin={48,-22})));
+  Physiolibrary.Fluid.Sensors.PressureMeasure pressureMeasureVB(redeclare 
+      package Medium = Blood) annotation (Placement(transformation(
+        extent={{-10,-10},{10,10}},
+        rotation=0,
+        origin={-120,-34})));
+  Physiolibrary.Fluid.Sensors.PressureMeasure pressureMeasureAP(redeclare 
+      package Medium = Blood)
+    annotation (Placement(transformation(extent={{-106,66},{-86,86}})));
+  Physiolibrary.Fluid.Sensors.PressureMeasure pressureMeasureVP(redeclare 
+      package Medium = Blood)
+    annotation (Placement(transformation(extent={{70,72},{90,92}})));
+  Physiolibrary.Types.Constants.HydraulicConductanceConst hydraulicConductance(
+      k=1.250102626409427e-07*(5/4)) annotation (Placement(transformation(
+        extent={{-4,-4},{4,4}},
+        rotation=180,
+        origin={102,6})));
+  Modelica.Blocks.Math.MultiProduct multiProduct(nu=2) annotation (Placement(
+        transformation(
+        extent={{-6,-6},{6,6}},
+        rotation=180,
+        origin={74,10})));
+  Physiolibrary.Types.Constants.HydraulicConductanceConst hydraulicConductance1(
+     k=1.250102626409427e-07*(5/4))
+    annotation (Placement(transformation(extent={{-130,8},{-122,16}})));
+  Modelica.Blocks.Math.MultiProduct multiProduct1(nu=2) annotation (Placement(
+        transformation(
+        extent={{-6,-6},{6,6}},
+        rotation=0,
+        origin={-96,8})));
+  Physiolibrary.Fluid.Sensors.FlowMeasure flowLeft(redeclare package Medium =
+        Blood) annotation (Placement(transformation(
+        extent={{-10,-10},{10,10}},
+        rotation=90,
+        origin={-74,36})));
+  Physiolibrary.Fluid.Components.Resistor VenResPulmo(redeclare package Medium
+      = Blood, Resistance=7999343.2449*(3/8))
+    annotation (Placement(transformation(extent={{2,56},{22,76}})));
+  Physiolibrary.Fluid.Components.Resistor VenResBody(redeclare package Medium
+      = Blood, Resistance=7999343.2449*(20/8)) annotation (Placement(
+        transformation(
+        extent={{-10,-10},{10,10}},
+        rotation=180,
+        origin={-48,-48})));
+  Physiolibrary.Fluid.Components.Resistor ArtResBody(redeclare package Medium
+      = Blood, Resistance=7999343.2449*((7/8)*20)) annotation (Placement(
+        transformation(
+        extent={{-10,-10},{10,10}},
+        rotation=180,
+        origin={12,-48})));
+  replaceable package Blood = Physiolibrary.Media.BloodBySiggaardAndersen annotation(choicesAllMatching=true);
+  Physiolibrary.Fluid.Interfaces.FluidPort_a SystemicCapOut(redeclare package
+      Medium = Blood) annotation (Placement(transformation(rotation=0, extent={
+            {-27.5,-110},{-2.5,-90}})));
+  Physiolibrary.Fluid.Interfaces.FluidPort_a PulmoCapillariesIn(redeclare 
+      package Medium = Blood) annotation (Placement(transformation(rotation=0,
+          extent={{-11.5,90},{13.5,110}})));
+  Physiolibrary.Fluid.Interfaces.FluidPort_b PulmoCapillariesOut
+    annotation (Placement(transformation(extent={{-64,90},{-44,110}})));
+  Physiolibrary.Fluid.Interfaces.FluidPort_b SystemicCapillariesIn
+    annotation (Placement(transformation(extent={{-74,-110},{-54,-90}})));
+equation 
+  connect(LeftHeart.q_in,VeinsPulmo. q_in[1]) annotation (Line(
+      points={{48,20},{48,67.7333},{47.9,67.7333}},
+      color={127,0,0},
+      thickness=0.5));
+  connect(LeftHeart.q_out,flowRight. q_in) annotation (Line(
+      points={{48,0},{48,-12}},
+      color={127,0,0},
+      thickness=0.5));
+  connect(flowRight.q_out,ArteriesBody. q_in[1]) annotation (Line(
+      points={{48,-32},{47.9,-46.2667}},
+      color={127,0,0},
+      thickness=0.5));
+  connect(pressureMeasureVP.q_in,VeinsPulmo. q_in[2]) annotation (Line(
+      points={{76,76},{76,66},{47.9,66}},
+      color={127,0,0},
+      thickness=0.5));
+  connect(pressureMeasureVP.pressure,multiProduct. u[1]) annotation (Line(
+        points={{86,78},{92,78},{92,7.9},{80,7.9}}, color={0,0,127}));
+  connect(multiProduct.y,LeftHeart. solutionFlow)
+    annotation (Line(points={{66.98,10},{55,10}}, color={0,0,127}));
+  connect(hydraulicConductance.y,multiProduct. u[2])
+    annotation (Line(points={{97,6},{80,6},{80,12.1}}, color={0,0,127}));
+  connect(RightHeart.q_out,flowLeft. q_in) annotation (Line(
+      points={{-74,18},{-74,26}},
+      color={127,0,0},
+      thickness=0.5));
+  connect(flowLeft.q_out,ArteriesPulmo. q_in[1]) annotation (Line(
+      points={{-74,46},{-74,69.7333},{-74.1,69.7333}},
+      color={127,0,0},
+      thickness=0.5));
+  connect(pressureMeasureAP.q_in,ArteriesPulmo. q_in[2]) annotation (Line(
+      points={{-100,70},{-100,68},{-74.1,68}},
+      color={127,0,0},
+      thickness=0.5));
+  connect(multiProduct1.y,RightHeart. solutionFlow)
+    annotation (Line(points={{-88.98,8},{-81,8}}, color={0,0,127}));
+  connect(hydraulicConductance1.y,multiProduct1. u[1]) annotation (Line(points={{-121,12},
+          {-102,12},{-102,10.1}},            color={0,0,127}));
+  connect(RightHeart.q_in,VeinsBody. q_in[1]) annotation (Line(
+      points={{-74,-2},{-74,-44.2667},{-74.1,-44.2667}},
+      color={127,0,0},
+      thickness=0.5));
+  connect(ArtResBody.q_in,ArteriesBody. q_in[3]) annotation (Line(
+      points={{22,-48},{48,-48},{48,-49.7333},{47.9,-49.7333}},
+      color={127,0,0},
+      thickness=0.5));
+  connect(VeinsPulmo.q_in[3],VenResPulmo. q_out) annotation (Line(
+      points={{47.9,64.2667},{34,64.2667},{34,66},{22,66}},
+      color={127,0,0},
+      thickness=0.5));
+  connect(VeinsBody.q_in[2],pressureMeasureVB. q_in) annotation (Line(
+      points={{-74.1,-46},{-124,-46},{-124,-40}},
+      color={127,0,0},
+      thickness=0.5));
+  connect(pressureMeasureVB.pressure,multiProduct1. u[2]) annotation (Line(
+        points={{-114,-38},{-100,-38},{-100,-8},{-112,-8},{-112,5.9},{-102,5.9}},
+        color={0,0,127}));
+  connect(PulmoCapillariesIn, VenResPulmo.q_in) annotation (Line(points={{1,100},
+          {0,100},{0,80},{-6,80},{-6,66},{2,66}}, color={127,0,0}));
+  connect(PulmoCapillariesOut, ArteriesPulmo.q_in[3]) annotation (Line(
+      points={{-54,100},{-54,66.2667},{-74.1,66.2667}},
+      color={127,0,0},
+      thickness=0.5));
+  connect(VenResBody.q_out, VeinsBody.q_in[3]) annotation (Line(
+      points={{-58,-48},{-66,-48},{-66,-47.7333},{-74.1,-47.7333}},
+      color={127,0,0},
+      thickness=0.5));
+  connect(ArtResBody.q_out, SystemicCapOut) annotation (Line(
+      points={{2,-48},{-15,-48},{-15,-100}},
+      color={127,0,0},
+      thickness=0.5));
+  connect(VenResBody.q_in, SystemicCapillariesIn) annotation (Line(
+      points={{-38,-48},{-38,-100},{-64,-100}},
+      color={127,0,0},
+      thickness=0.5));
+  annotation (
+    Diagram(coordinateSystem(extent={{-140,-100},{110,100}})),
+    Icon(coordinateSystem(extent={{-140,-100},{110,100}})));
+end Circulation2;
