@@ -176,20 +176,18 @@ package Hack_Maduda
   end Circulation2;
 
   model resp
-    //parameter Physiolibrary.Types.HydraulicConductance c_perf=1.250102626409427e-07
-       // *((1 - 0.02)*(1/3));
     //parameter Physiolibrary.Types.Fraction FlungsShunt_start=0.05;
-    parameter Physiolibrary.Types.HydraulicConductance c_shunt=
-        1.250102626409427e-07*(0.02*(1/3));
     parameter Physiolibrary.Types.Frequency RR=0.28333333333333
                                                "Respiration Rate";
     parameter Physiolibrary.Types.Volume TV=0.0005 "Tidal Volume",
                                              DV=0.00015 "Dead space";
     package Air = Physiolibrary.Media.Air;
-    parameter Physiolibrary.Types.HydraulicConductance c_TotalVentilation(
-        displayUnit="l/(cmH2O.s)")=1.019716212977928e-05*(((1/1.5)))               "Total Lung Conductance";
+    parameter Physiolibrary.Types.HydraulicConductance c_TotalVentilation=
+        1.019716212977928e-05*(((1/1.5)))                                          "Total Lung Conductance";
     parameter Physiolibrary.Types.HydraulicConductance c_TotalPerfusion=
         1.250102626409427e-07*(1/3*(1 - 0.02))                                   "Total Lung Conductance";
+    parameter Physiolibrary.Types.HydraulicConductance c_shunt=
+        1.250102626409427e-07*(0.02*(1/3));
     parameter Integer NA=10  "Number of Alveolar Unit";
     Physiolibrary.Fluid.Sources.PressureSource pressureSource(redeclare package
         Medium = Air)
@@ -203,8 +201,8 @@ package Hack_Maduda
       annotation (Placement(transformation(extent={{70,50},{90,70}})));
     Physiolibrary.Fluid.Components.Resistor systemicRes(redeclare package
         Medium =
-          Physiolibrary.Media.BloodBySiggaardAndersen, Resistance=7999343.2449*(20
-          *(7/8)))
+          Physiolibrary.Media.BloodBySiggaardAndersen, Resistance=7999343.2449*
+          (20*(7/8)))
       annotation (Placement(transformation(extent={{30,-124},{50,-104}})));
     Physiolibrary.Fluid.Components.ElasticVessel SystemCapillaries(
       redeclare package Medium = Physiolibrary.Media.BloodBySiggaardAndersen,
@@ -243,8 +241,7 @@ package Hack_Maduda
       redeclare package Medium = Physiolibrary.Media.BloodBySiggaardAndersen)
       annotation (Placement(transformation(extent={{-152,-110},{-132,-90}})));
     Physiolibrary.Fluid.Components.Conductor shunt(redeclare package Medium =
-          Physiolibrary.Media.BloodBySiggaardAndersen, Conductance=1.250102626409427e-07
-          *(0.02*(1/3)))
+          Physiolibrary.Media.BloodBySiggaardAndersen, Conductance=c_shunt)
       annotation (Placement(transformation(extent={{-20,-14},{0,6}})));
     AlveolarUnit alveolarUnit[NA](
       redeclare package Air = Air,
@@ -292,8 +289,8 @@ package Hack_Maduda
             -100},{-78,-100},{-78,-136},{-94,-136}}, color={158,66,200}));
     connect(pO2_tissue.referenceFluidPort, SystemCapillaries.q_in[4]) annotation (
        Line(
-        points={{-142,-109.8},{-142,-118},{-26,-118},{-26,-116},{-26.1,-116},{-26.1,
-            -137.95}},
+        points={{-142,-109.8},{-142,-114},{-26,-114},{-26,-112},{-26.1,-112},{
+            -26.1,-137.95}},
         color={127,0,0},
         thickness=0.5));
 
@@ -320,9 +317,9 @@ package Hack_Maduda
         points={{-2,22},{-2,20},{70,20},{70,-28},{-0.944,-28},{-0.944,-40.2}},
         color={127,0,0},
         thickness=0.5));
-    connect(circulation2_1.PulmoCapillariesIn, alveolarUnit[i].q_in2) annotation (
+    connect(alveolarUnit[i].q_in2, circulation2_1.PulmoCapillariesIn) annotation (
         Line(
-        points={{-4.496,-40.2},{-4.496,-36},{-80,-36},{-80,22},{-12,22}},
+        points={{-12,22},{-12,20},{-100,20},{-100,-40.2},{-4.496,-40.2}},
         color={127,0,0},
         thickness=0.5));
     end for;
@@ -1025,7 +1022,7 @@ package Hack_Maduda
           origin={-6,-50})));
     Physiolibrary.Fluid.Components.Conductor PulmonaryCon(redeclare package
         Medium = Physiolibrary.Media.BloodBySiggaardAndersen, Conductance=
-          c_circulation*(7/8))
+          C_circulation*(8/7))
                           annotation (Placement(transformation(
           extent={{-10,-10},{10,10}},
           rotation=180,
@@ -1035,8 +1032,8 @@ package Hack_Maduda
       annotation (Placement(transformation(extent={{-46,60},{-26,80}})));
     Physiolibrary.Fluid.Components.Conductor PulmoVeins(redeclare package
         Medium =
-          Physiolibrary.Media.BloodBySiggaardAndersen, Conductance=c_circulation*(
-          1/8))
+          Physiolibrary.Media.BloodBySiggaardAndersen, Conductance=
+          C_circulation*(8))
       annotation (Placement(transformation(extent={{28,-98},{48,-78}})));
   //   parameter Physiolibrary.Types.HydraulicConductance c_perf=1.250102626409427e-07
   //       *((1 - 0.02)*(1/3));
