@@ -2,8 +2,7 @@ within ;
 package ModelicaHackathonPoriz
   model ComplexGasExchangeSystem
     replaceable package CurrentlyChosenMedium =
-        Physiolibrary.Media.BloodBySiggaardAndersen constrainedby
-      Physiolibrary.Media.Interfaces.PartialMedium                                                             annotation(choicesAllMatching=true);
+        Physiolibrary.Media.BloodBySiggaardAndersen constrainedby Physiolibrary.Media.Interfaces.PartialMedium annotation(choicesAllMatching=true);
 
     replaceable package Currently_Chosen_Environment = Physiolibrary.Media.Air;
 
@@ -13,11 +12,16 @@ package ModelicaHackathonPoriz
                                             "Tidal volume";
     parameter Physiolibrary.Types.Volume DV=0.00015
                                             "Deadspace volume";
-    parameter Physiolibrary.Types.HydraulicConductance C(displayUnit="l/(cmH2O.s)")=
-       1.019716212977928e-05*(1/1.5)                     "Total lung conductance";
-    parameter Integer N=1
-                        "Number of alveolus";
-    parameter Integer NumberOfAlveolarUnits=1;
+    parameter Physiolibrary.Types.HydraulicConductance C_totalVentilation=1.019716212977928e-05*(1/1.5)
+                                                         "Total lung conductance";
+
+    parameter Physiolibrary.Types.HydraulicConductance C_totalPerfusion=1.250102626409427e-10*(1/3*(1 - 0.02))
+                                                         "Total conductance of pulmonary ventilated blood vessels";
+
+     parameter Physiolibrary.Types.HydraulicConductance C_shunt=1.250102626409427e-10*(1/3*0.02)
+                                                     "Hydraulic conductance of pulmonary circulation shunt";
+
+    parameter Integer NumberOfAlveolarUnits=2 "Number of alveolus";
     Physiolibrary.Fluid.Components.VolumePump left_heart(
       redeclare package Medium = CurrentlyChosenMedium,  useSolutionFlowInput=true,
         SolutionFlow(displayUnit="l/min") = 8.3333333333333e-05) annotation (
@@ -50,18 +54,17 @@ package ModelicaHackathonPoriz
       volume_start(displayUnit="l") = 0.00038,
       Compliance(displayUnit="ml/mmHg") = 3.6002955640592e-08,
       ZeroPressureVolume(displayUnit="l") = 0.0003,
-      nPorts=3) annotation (Placement(transformation(extent={{-70,56},{-50,76}})));
+      nPorts=4) annotation (Placement(transformation(extent={{-70,56},{-50,76}})));
     Physiolibrary.Fluid.Components.ElasticVessel pulmonary_veins(
       redeclare package Medium = CurrentlyChosenMedium,
       volume_start(displayUnit="l") = 0.0004,
       Compliance(displayUnit="ml/mmHg") = 7.5006157584566e-08,
       ZeroPressureVolume(displayUnit="l") = 0.0004,
-      nPorts=3) annotation (Placement(transformation(extent={{50,54},{70,74}})));
-    Physiolibrary.Fluid.Sensors.PressureMeasure pressure_arteries(redeclare
-        package Medium = CurrentlyChosenMedium)
+      nPorts=4) annotation (Placement(transformation(extent={{50,54},{70,74}})));
+    Physiolibrary.Fluid.Sensors.PressureMeasure pressure_arteries(redeclare package Medium =
+                         CurrentlyChosenMedium)
       annotation (Placement(transformation(extent={{80,-72},{100,-52}})));
-    Physiolibrary.Fluid.Sensors.FlowMeasure flowMeasure(redeclare package
-        Medium =
+    Physiolibrary.Fluid.Sensors.FlowMeasure flowMeasure(redeclare package Medium =
           CurrentlyChosenMedium)                        annotation (Placement(
           transformation(
           extent={{10,-10},{-10,10}},
@@ -70,8 +73,7 @@ package ModelicaHackathonPoriz
     Physiolibrary.Fluid.Sensors.PressureMeasure pressure_pulmonary_veins(
         redeclare package Medium = CurrentlyChosenMedium)
       annotation (Placement(transformation(extent={{78,62},{98,82}})));
-    Physiolibrary.Fluid.Sensors.PressureMeasure pressure_veins(redeclare
-        package Medium =
+    Physiolibrary.Fluid.Sensors.PressureMeasure pressure_veins(redeclare package Medium =
                  CurrentlyChosenMedium)
       annotation (Placement(transformation(extent={{-90,-72},{-70,-52}})));
     Physiolibrary.Fluid.Sensors.PressureMeasure pressure_pulmonary_arteries(
@@ -105,22 +107,19 @@ package ModelicaHackathonPoriz
           extent={{-10,-10},{10,10}},
           rotation=90,
           origin={0,-110})));
-    Physiolibrary.Fluid.Components.Resistor systemic_resitance1(redeclare
-        package Medium =
+    Physiolibrary.Fluid.Components.Resistor systemic_resitance1(redeclare package Medium =
                  CurrentlyChosenMedium, Resistance=7999343.2449*(20*1/8))
       annotation (Placement(transformation(extent={{-28,-84},{-8,-64}})));
-    Physiolibrary.Fluid.Components.Resistor systemic_resitance2(redeclare
-        package Medium =
+    Physiolibrary.Fluid.Components.Resistor systemic_resitance2(redeclare package Medium =
                  CurrentlyChosenMedium, Resistance=7999343.2449*(20*7/8))
       annotation (Placement(transformation(extent={{10,-84},{30,-64}})));
     Physiolibrary.Fluid.Sensors.PressureMeasure pressure_systemic_capillaries(
         redeclare package Medium = CurrentlyChosenMedium)
       annotation (Placement(transformation(extent={{6,-68},{26,-48}})));
-    Physiolibrary.Fluid.Sources.PressureSource inspiredAir(redeclare package
-        Medium = Physiolibrary.Media.Air)
+    Physiolibrary.Fluid.Sources.PressureSource inspiredAir(redeclare package Medium =
+                 Physiolibrary.Media.Air)
       annotation (Placement(transformation(extent={{-98,206},{-78,226}})));
-    Physiolibrary.Fluid.Components.VolumePump deadspace(redeclare package
-        Medium =
+    Physiolibrary.Fluid.Components.VolumePump deadspace(redeclare package Medium =
           Physiolibrary.Media.Air, SolutionFlow=DV*RR)
       annotation (Placement(transformation(extent={{-10,-10},{10,10}},
           rotation=0,
@@ -128,8 +127,8 @@ package ModelicaHackathonPoriz
     Physiolibrary.Fluid.Sources.VolumeOutflowSource totalRespiration(SolutionFlow=
          TV*RR, redeclare package Medium = Physiolibrary.Media.Air)
                 annotation (Placement(transformation(extent={{82,208},{102,228}})));
-    Physiolibrary.Fluid.Sensors.FlowMeasure totalVentilation(redeclare package
-        Medium = Physiolibrary.Media.Air)
+    Physiolibrary.Fluid.Sensors.FlowMeasure totalVentilation(redeclare package Medium =
+                 Physiolibrary.Media.Air)
       annotation (Placement(transformation(extent={{52,208},{72,228}})));
     Chemical.Sources.SubstanceOutflow O2_left(SubstanceFlow(displayUnit=
             "mmol/min") = 0.00025666666666667) annotation (Placement(
@@ -145,12 +144,19 @@ package ModelicaHackathonPoriz
           extent={{-10,-10},{10,10}},
           rotation=180,
           origin={52,-130})));
-    AlveolarUnit alveolarUnit(redeclare package CurrentlyChosenMedium =
-          CurrentlyChosenMedium) annotation (Placement(transformation(rotation=
-              0, extent={{-14,174},{6,194}})));
+    AlveolarUnit alveolarUnit[NumberOfAlveolarUnits](
+      redeclare package CurrentlyChosenMedium = CurrentlyChosenMedium,
+      C_ventilation=ones(NumberOfAlveolarUnits)*(C_totalVentilation/
+          NumberOfAlveolarUnits),
+      C_circulation=ones(NumberOfAlveolarUnits)*(C_totalPerfusion/
+          NumberOfAlveolarUnits))                   annotation (Placement(
+          transformation(rotation=0, extent={{-14,174},{6,194}})));
+    Physiolibrary.Fluid.Components.Conductor shunt(redeclare package Medium = Physiolibrary.Media.BloodBySiggaardAndersen,
+                                                   Conductance=C_shunt)
+      annotation (Placement(transformation(extent={{-10,102},{10,122}})));
   equation
     connect(left_heart.q_in, pulmonary_veins.q_in[1]) annotation (Line(
-        points={{62,4},{62,65.7333},{59.9,65.7333}},
+        points={{62,4},{62,65.95},{59.9,65.95}},
         color={127,0,0},
         thickness=0.5));
     connect(right_heart.q_in, veins.q_in[1]) annotation (Line(
@@ -158,12 +164,11 @@ package ModelicaHackathonPoriz
         color={127,0,0},
         thickness=0.5));
     connect(right_heart.q_out, pulmonary_arteries.q_in[1]) annotation (Line(
-        points={{-62,4},{-60.1,4},{-60.1,67.7333}},
+        points={{-62,4},{-60.1,4},{-60.1,67.95}},
         color={127,0,0},
         thickness=0.5));
     connect(pressure_arteries.q_in, arteries.q_in[1]) annotation (Line(
-        points={{86,-68},{86,-76},{76,-76},{76,-60},{60,-60},{60,-70},{61.9,-70},
-            {61.9,-72.2667}},
+        points={{86,-68},{86,-76},{76,-76},{76,-60},{60,-60},{60,-70},{61.9,-70},{61.9,-72.2667}},
         color={127,0,0},
         thickness=0.5));
     connect(flowMeasure.q_in, left_heart.q_out) annotation (Line(
@@ -176,7 +181,7 @@ package ModelicaHackathonPoriz
         thickness=0.5));
     connect(pressure_pulmonary_veins.q_in, pulmonary_veins.q_in[2]) annotation (
         Line(
-        points={{84,66},{84,50},{62,50},{62,64},{59.9,64}},
+        points={{84,66},{84,50},{62,50},{62,64.65},{59.9,64.65}},
         color={127,0,0},
         thickness=0.5));
     connect(pressure_veins.q_in, veins.q_in[2]) annotation (Line(
@@ -185,7 +190,7 @@ package ModelicaHackathonPoriz
         thickness=0.5));
     connect(pressure_pulmonary_arteries.q_in, pulmonary_arteries.q_in[2])
       annotation (Line(
-        points={{-82,68},{-82,52},{-60.1,52},{-60.1,66}},
+        points={{-82,68},{-82,52},{-60.1,52},{-60.1,66.65}},
         color={127,0,0},
         thickness=0.5));
     connect(product1.u2, hydraulicConductance.y)
@@ -201,14 +206,12 @@ package ModelicaHackathonPoriz
     connect(pressure_veins.pressure, product2.u1) annotation (Line(points={{-74,-66},
             {-76,-66},{-76,-44},{-90,-44},{-90,-34}}, color={0,0,127}));
     connect(systemic_resitance2.q_out, arteries.q_in[3]) annotation (Line(
-        points={{30,-74},{48,-74},{48,-60},{60,-60},{60,-70},{61.9,-70},{61.9,
-            -75.7333}},
+        points={{30,-74},{48,-74},{48,-60},{60,-60},{60,-70},{61.9,-70},{61.9,-75.7333}},
         color={127,0,0},
         thickness=0.5));
 
     connect(systemic_resitance1.q_in, veins.q_in[3]) annotation (Line(
-        points={{-28,-74},{-46,-74},{-46,-60},{-62,-60},{-62,-68},{-60.1,-68},{
-            -60.1,-75.7333}},
+        points={{-28,-74},{-46,-74},{-46,-60},{-62,-60},{-62,-68},{-60.1,-68},{-60.1,-75.7333}},
         color={127,0,0},
         thickness=0.5));
     connect(systemic_capillaries.q_in[1], systemic_resitance1.q_out) annotation (
@@ -239,27 +242,40 @@ package ModelicaHackathonPoriz
         points={{-8,236},{-66,236},{-66,216},{-78,216}},
         color={127,0,0},
         thickness=0.5));
-    connect(alveolarUnit.q_in, pulmonary_arteries.q_in[3]) annotation (Line(
-        points={{-8,174},{-8,50},{-60.1,50},{-60.1,64.2667}},
-        color={127,0,0},
-        thickness=0.5));
-    connect(alveolarUnit.q_out1, pulmonary_veins.q_in[3]) annotation (Line(
-        points={{0,174},{0,48},{62,48},{62,62.2667},{59.9,62.2667}},
-        color={127,0,0},
-        thickness=0.5));
-    connect(alveolarUnit.q_in2, inspiredAir.y) annotation (Line(
-        points={{-12,194},{-12,216},{-78,216}},
-        color={127,0,0},
-        thickness=0.5));
-    connect(alveolarUnit.q_out, totalVentilation.q_in) annotation (Line(
-        points={{2,194},{2,218},{44,218},{44,236},{52,236},{52,218}},
-        color={127,0,0},
-        thickness=0.5));
-    connect(systemic_resitance2.q_in, systemic_capillaries.q_in[2]) annotation
-      (Line(
+    connect(systemic_resitance2.q_in, systemic_capillaries.q_in[2]) annotation (
+       Line(
         points={{10,-74},{1.3,-74},{1.3,-110.1}},
         color={127,0,0},
         thickness=0.5));
+    connect(shunt.q_in, pulmonary_arteries.q_in[3]) annotation (Line(
+        points={{-10,112},{-18,112},{-18,52},{-60.1,52},{-60.1,65.35}},
+        color={127,0,0},
+        thickness=0.5));
+    connect(shunt.q_out, pulmonary_veins.q_in[3]) annotation (Line(
+        points={{10,112},{20,112},{20,62},{50,62},{50,63.35},{59.9,63.35}},
+        color={127,0,0},
+        thickness=0.5));
+
+    for i in 1:NumberOfAlveolarUnits loop
+    connect(alveolarUnit[i].q_in2, inspiredAir.y) annotation (Line(
+        points={{-12,194},{-12,216},{-78,216}},
+        color={127,0,0},
+        thickness=0.5));
+    connect(alveolarUnit[i].q_out, totalVentilation.q_in) annotation (Line(
+        points={{2,194},{2,218},{52,218}},
+        color={127,0,0},
+        thickness=0.5));
+    connect(alveolarUnit[i].q_in, pulmonary_arteries.q_in[4]) annotation (Line(
+        points={{-8,174},{-8,156},{-60,156},{-60,112},{-60.1,112},{-60.1,64.05}},
+        color={127,0,0},
+        thickness=0.5));
+    connect(alveolarUnit[i].q_out1, pulmonary_veins.q_in[4]) annotation (Line(
+        points={{0,174},{0,156},{60,156},{60,62},{59.9,62},{59.9,62.05}},
+        color={127,0,0},
+        thickness=0.5));
+    end for;
+
+
     annotation (Diagram(coordinateSystem(extent={{-240,-200},{220,340}}),
           graphics={
           Rectangle(
@@ -307,8 +323,8 @@ package ModelicaHackathonPoriz
     Physiolibrary.Fluid.Sources.PressureSource environment(redeclare package
         Medium = Currently_Chosen_Environment)
       annotation (Placement(transformation(extent={{-92,28},{-72,48}})));
-    Physiolibrary.Fluid.Components.VolumePump Deadspace_volume_flow(redeclare
-        package Medium = Currently_Chosen_Environment,              SolutionFlow=
+    Physiolibrary.Fluid.Components.VolumePump Deadspace_volume_flow(redeclare package
+                Medium = Currently_Chosen_Environment,              SolutionFlow=
           DV*RR) annotation (Placement(transformation(extent={{-2,72},{18,92}})));
     Physiolibrary.Fluid.Sources.VolumeOutflowSource outflow(SolutionFlow=TV*RR,
         redeclare package Medium = Currently_Chosen_Environment)
@@ -325,14 +341,14 @@ package ModelicaHackathonPoriz
       nPorts=4) annotation (Placement(transformation(extent={{-10,10},{10,-10}},
           rotation=90,
           origin={12,8})));
-    Physiolibrary.Fluid.Sensors.PressureMeasure alveolus_pressure(redeclare
-        package Medium = Currently_Chosen_Environment)
+    Physiolibrary.Fluid.Sensors.PressureMeasure alveolus_pressure(redeclare package
+                Medium = Currently_Chosen_Environment)
       annotation (Placement(transformation(extent={{62,-2},{82,18}})));
-    Physiolibrary.Fluid.Sensors.FlowMeasure post_alveolus_volume_flow(redeclare
-        package Medium = Currently_Chosen_Environment)
+    Physiolibrary.Fluid.Sensors.FlowMeasure post_alveolus_volume_flow(redeclare package
+                Medium = Currently_Chosen_Environment)
       annotation (Placement(transformation(extent={{32,8},{52,28}})));
-    Physiolibrary.Fluid.Sensors.FlowMeasure pre_alveolus_volume_flow(redeclare
-        package Medium = Currently_Chosen_Environment)
+    Physiolibrary.Fluid.Sensors.FlowMeasure pre_alveolus_volume_flow(redeclare package
+                Medium = Currently_Chosen_Environment)
       annotation (Placement(transformation(extent={{-26,8},{-6,28}})));
     Physiolibrary.Fluid.Components.Conductor conductor(redeclare package Medium =
           Currently_Chosen_Environment,                Conductance=C/N)
@@ -439,8 +455,8 @@ package ModelicaHackathonPoriz
     Physiolibrary.Fluid.Sources.PressureSource environment(redeclare package
         Medium = Currently_Chosen_Environment)
       annotation (Placement(transformation(extent={{-94,30},{-74,50}})));
-    Physiolibrary.Fluid.Components.VolumePump Deadspace_volume_flow(redeclare
-        package Medium = Currently_Chosen_Environment,              SolutionFlow=
+    Physiolibrary.Fluid.Components.VolumePump Deadspace_volume_flow(redeclare package
+                Medium = Currently_Chosen_Environment,              SolutionFlow=
           DV*RR) annotation (Placement(transformation(extent={{-2,72},{18,92}})));
     Physiolibrary.Fluid.Sources.VolumeOutflowSource outflow(SolutionFlow=TV*RR,
         redeclare package Medium = Currently_Chosen_Environment)
@@ -457,11 +473,11 @@ package ModelicaHackathonPoriz
       nPorts=2) annotation (Placement(transformation(extent={{-10,-10},{10,10}},
           rotation=90,
           origin={14,-2})));
-    Physiolibrary.Fluid.Sensors.FlowMeasure post_alveolus_volume_flow(redeclare
-        package Medium = Currently_Chosen_Environment)
+    Physiolibrary.Fluid.Sensors.FlowMeasure post_alveolus_volume_flow(redeclare package
+                Medium = Currently_Chosen_Environment)
       annotation (Placement(transformation(extent={{32,8},{52,28}})));
-    Physiolibrary.Fluid.Sensors.FlowMeasure pre_alveolus_volume_flow(redeclare
-        package Medium = Currently_Chosen_Environment)
+    Physiolibrary.Fluid.Sensors.FlowMeasure pre_alveolus_volume_flow(redeclare package
+                Medium = Currently_Chosen_Environment)
       annotation (Placement(transformation(extent={{-24,8},{-4,28}})));
     Physiolibrary.Fluid.Components.Resistor resistor(redeclare package Medium =
           Currently_Chosen_Environment, Resistance(displayUnit="(cmH2O.s)/l")=
@@ -524,8 +540,8 @@ package ModelicaHackathonPoriz
           extent={{-10,-10},{10,10}},
           rotation=90,
           origin={2,168})));
-    Physiolibrary.Fluid.Sensors.PressureMeasure pressureMeasure(redeclare
-        package Medium = Physiolibrary.Media.Air)
+    Physiolibrary.Fluid.Sensors.PressureMeasure pressureMeasure(redeclare package Medium =
+                         Physiolibrary.Media.Air)
       annotation (Placement(transformation(extent={{-4,190},{16,210}})));
     Chemical.Components.GasSolubility gasSolubilityO2(KC=1e-4)
       annotation (Placement(transformation(extent={{-24,128},{-4,148}})));
@@ -545,34 +561,42 @@ package ModelicaHackathonPoriz
           extent={{-10,10},{10,-10}},
           rotation=180,
           origin={76,142})));
-    Physiolibrary.Fluid.Components.Resistor resistor(redeclare package Medium
-        = Physiolibrary.Media.Air, Resistance(displayUnit="(cmH2O.s)/l")=
-        98066.5*(1/1.5))
-      annotation (Placement(transformation(extent={{-70,176},{-50,196}})));
-    Physiolibrary.Fluid.Components.Resistor pulmonary_resistance1(redeclare
-        package Medium = CurrentlyChosenMedium, Resistance=7999343.2449*(3*7/8))
+    Physiolibrary.Fluid.Components.Resistor pulmonary_resistance1(redeclare package Medium =
+                         CurrentlyChosenMedium, Resistance=(1/C_circulation)*(7/8))
       annotation (Placement(transformation(extent={{-32,50},{-12,70}})));
-    Physiolibrary.Fluid.Components.Resistor pulmonary_resistance2(redeclare
-        package Medium = CurrentlyChosenMedium, Resistance=7999343.2449*(3*1/8))
+    Physiolibrary.Fluid.Components.Resistor pulmonary_resistance2(redeclare package Medium =
+                         CurrentlyChosenMedium, Resistance=(1/C_circulation)*(1/8))
       annotation (Placement(transformation(extent={{10,50},{30,70}})));
     replaceable package CurrentlyChosenMedium =
-        Physiolibrary.Media.BloodBySiggaardAndersen constrainedby
-      Physiolibrary.Media.Interfaces.PartialMedium                                                             annotation(choicesAllMatching=true);
-    Physiolibrary.Fluid.Interfaces.FluidPort_b q_out(redeclare package Medium
-        = Physiolibrary.Media.Air) annotation (Placement(transformation(
+        Physiolibrary.Media.BloodBySiggaardAndersen constrainedby Physiolibrary.Media.Interfaces.PartialMedium annotation(choicesAllMatching=true);
+      parameter Physiolibrary.Types.HydraulicConductance C_ventilation(displayUnit="l/(cmH2O.s)")=1.019716212977928e-05*(1/1.5);
+      parameter Physiolibrary.Types.HydraulicConductance C_circulation=1.250102626409427e-10*(1/3*(1 - 0.02));
+
+    Physiolibrary.Fluid.Interfaces.FluidPort_b q_out(redeclare package Medium =
+          Physiolibrary.Media.Air) annotation (Placement(transformation(
             rotation=0, extent={{50,230},{70,250}})));
     Physiolibrary.Fluid.Interfaces.FluidPort_a q_in(redeclare package Medium =
           CurrentlyChosenMedium) annotation (Placement(transformation(rotation=
               0, extent={{-50,30},{-30,50}})));
-    Physiolibrary.Fluid.Interfaces.FluidPort_b q_out1(redeclare package Medium
-        = CurrentlyChosenMedium) annotation (Placement(transformation(rotation=
+    Physiolibrary.Fluid.Interfaces.FluidPort_b q_out1(redeclare package Medium =
+          CurrentlyChosenMedium) annotation (Placement(transformation(rotation=
               0, extent={{30,30},{50,50}})));
-    Physiolibrary.Fluid.Interfaces.FluidPort_a q_in2(redeclare package Medium
-        = Physiolibrary.Media.Air) annotation (Placement(transformation(
+    Physiolibrary.Fluid.Interfaces.FluidPort_a q_in2(redeclare package Medium =
+          Physiolibrary.Media.Air) annotation (Placement(transformation(
             rotation=0, extent={{-90,230},{-70,250}})));
-    Physiolibrary.Fluid.Sensors.FlowMeasure flowMeasure1(redeclare package
-        Medium = Physiolibrary.Media.Air)
-      annotation (Placement(transformation(extent={{30,174},{50,194}})));
+    Physiolibrary.Fluid.Sensors.FlowMeasure flowMeasure1(redeclare package Medium =
+                 Physiolibrary.Media.Air)
+      annotation (Placement(transformation(extent={{30,158},{50,178}})));
+    Physiolibrary.Fluid.Components.Resistor resistor(redeclare package Medium = Physiolibrary.Media.Air, Resistance=1/C_ventilation)
+      annotation (Placement(transformation(
+          extent={{-10,-10},{10,10}},
+          rotation=-90,
+          origin={-80,212})));
+    Physiolibrary.Fluid.Components.Resistor resistor1(redeclare package Medium = Physiolibrary.Media.Air, Resistance=1/C_ventilation)
+      annotation (Placement(transformation(
+          extent={{-10,-10},{10,10}},
+          rotation=-90,
+          origin={60,214})));
   equation
     connect(pulmonary_capillaries.q_in[1], pulmonary_resistance2.q_in)
       annotation (Line(
@@ -602,18 +626,6 @@ package ModelicaHackathonPoriz
             {-36,40},{-36,60},{-32,60}}, color={127,0,0}));
     connect(q_out1, pulmonary_resistance2.q_out) annotation (Line(points={{40,
             40},{36,40},{36,60},{30,60}}, color={127,0,0}));
-    connect(q_in2, resistor.q_in) annotation (Line(
-        points={{-80,240},{-80,186},{-70,186}},
-        color={127,0,0},
-        thickness=0.5));
-    connect(resistor.q_out, alveolar.q_in[1]) annotation (Line(
-        points={{-50,186},{-24,186},{-24,167.9},{0.266667,167.9}},
-        color={127,0,0},
-        thickness=0.5));
-    connect(pressureMeasure.q_in, alveolar.q_in[2]) annotation (Line(
-        points={{2,194},{2,180},{2,167.9},{2,167.9}},
-        color={127,0,0},
-        thickness=0.5));
     connect(pO2.referenceFluidPort, pulmonary_capillaries.q_in[2]) annotation (
         Line(
         points={{-80,136.2},{-80,88},{0,88},{0,100},{1.35,100},{1.35,104.1}},
@@ -625,17 +637,33 @@ package ModelicaHackathonPoriz
         color={127,0,0},
         thickness=0.5));
 
-    connect(q_out, flowMeasure1.q_out) annotation (Line(
-        points={{60,240},{60,184},{50,184}},
-        color={127,0,0},
-        thickness=0.5));
-    connect(flowMeasure1.q_in, alveolar.q_in[3]) annotation (Line(
-        points={{30,184},{3.73333,184},{3.73333,167.9}},
-        color={127,0,0},
-        thickness=0.5));
     connect(pulmonary_resistance1.q_out, pulmonary_capillaries.q_in[4])
       annotation (Line(
         points={{-12,60},{-4,60},{-4,102},{3.95,102},{3.95,104.1}},
+        color={127,0,0},
+        thickness=0.5));
+    connect(q_out, resistor1.q_in) annotation (Line(
+        points={{60,240},{60,224}},
+        color={127,0,0},
+        thickness=0.5));
+    connect(resistor1.q_out, flowMeasure1.q_out) annotation (Line(
+        points={{60,204},{60,168},{50,168}},
+        color={127,0,0},
+        thickness=0.5));
+    connect(q_in2, resistor.q_in) annotation (Line(
+        points={{-80,240},{-80,222}},
+        color={127,0,0},
+        thickness=0.5));
+    connect(resistor.q_out, alveolar.q_in[1]) annotation (Line(
+        points={{-80,202},{-80,167.9},{0.266667,167.9}},
+        color={127,0,0},
+        thickness=0.5));
+    connect(flowMeasure1.q_in, alveolar.q_in[2]) annotation (Line(
+        points={{30,168},{2,168},{2,167.9}},
+        color={127,0,0},
+        thickness=0.5));
+    connect(pressureMeasure.q_in, alveolar.q_in[3]) annotation (Line(
+        points={{2,194},{2,167.9},{3.73333,167.9}},
         color={127,0,0},
         thickness=0.5));
     annotation (Diagram(coordinateSystem(extent={{-100,40},{100,240}})), Icon(
@@ -643,6 +671,6 @@ package ModelicaHackathonPoriz
   end AlveolarUnit;
   annotation (uses(
       Modelica(version="4.0.0"),
-      Physiolibrary(version="3.0.0-alpha8"),
-      Chemical(version="1.4.0")));
+      Chemical(version="1.4.0"),
+      Physiolibrary(version="3.0.0-alpha7")));
 end ModelicaHackathonPoriz;
