@@ -145,9 +145,9 @@ package ModelicaHackathonPoriz
           extent={{-10,-10},{10,10}},
           rotation=180,
           origin={52,-130})));
-    AlveolarUnit alveolarUnit[NumberOfAlveolarUnits](redeclare package
-        CurrentlyChosenMedium = CurrentlyChosenMedium) annotation (Placement(
-          transformation(rotation=0, extent={{-14,174},{6,194}})));
+    AlveolarUnit alveolarUnit(redeclare package CurrentlyChosenMedium =
+          CurrentlyChosenMedium) annotation (Placement(transformation(rotation=
+              0, extent={{-14,174},{6,194}})));
   equation
     connect(left_heart.q_in, pulmonary_veins.q_in[1]) annotation (Line(
         points={{62,4},{62,65.7333},{59.9,65.7333}},
@@ -211,16 +211,6 @@ package ModelicaHackathonPoriz
             -60.1,-75.7333}},
         color={127,0,0},
         thickness=0.5));
-    connect(alveolarUnit.q_out1,         pulmonary_veins.q_in[3]) annotation (
-        Line(
-        points={{0,174},{0,48},{62,48},{62,62.2667},{59.9,62.2667}},
-        color={127,0,0},
-        thickness=0.5));
-    connect(alveolarUnit.q_in,          pulmonary_arteries.q_in[3]) annotation (
-        Line(
-        points={{-8,174},{-8,50},{-60.1,50},{-60.1,64.2667}},
-        color={127,0,0},
-        thickness=0.5));
     connect(systemic_resitance2.q_in, systemic_resitance1.q_out) annotation (Line(
         points={{10,-74},{-8,-74}},
         color={127,0,0},
@@ -253,7 +243,19 @@ package ModelicaHackathonPoriz
         points={{-8,236},{-66,236},{-66,216},{-78,216}},
         color={127,0,0},
         thickness=0.5));
-    connect(alveolarUnit[1].q_out, totalVentilation.q_in) annotation (Line(
+    connect(alveolarUnit.q_in, pulmonary_arteries.q_in[3]) annotation (Line(
+        points={{-8,174},{-8,50},{-60.1,50},{-60.1,64.2667}},
+        color={127,0,0},
+        thickness=0.5));
+    connect(alveolarUnit.q_out1, pulmonary_veins.q_in[3]) annotation (Line(
+        points={{0,174},{0,48},{62,48},{62,62.2667},{59.9,62.2667}},
+        color={127,0,0},
+        thickness=0.5));
+    connect(alveolarUnit.q_in2, inspiredAir.y) annotation (Line(
+        points={{-12,194},{-12,216},{-78,216}},
+        color={127,0,0},
+        thickness=0.5));
+    connect(alveolarUnit.q_out, totalVentilation.q_in) annotation (Line(
         points={{2,194},{2,218},{44,218},{44,236},{52,236},{52,218}},
         color={127,0,0},
         thickness=0.5));
@@ -620,7 +622,8 @@ package ModelicaHackathonPoriz
         thickness=0.5));
     connect(pCO2.referenceFluidPort, pulmonary_capillaries.q_in[3]) annotation
       (Line(
-        points={{76,132.2},{76,88},{0,88},{0,100},{2,100},{2,104.1}},
+        points={{76,132.2},{76,88},{0,88},{0,100},{3.73333,100},{3.73333,104.1}},
+
         color={127,0,0},
         thickness=0.5));
     annotation (Diagram(coordinateSystem(extent={{-100,40},{100,240}})), Icon(
