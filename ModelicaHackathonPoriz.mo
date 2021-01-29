@@ -67,7 +67,8 @@ package ModelicaHackathonPoriz
     Physiolibrary.Fluid.Sensors.PressureMeasure pressure_arteries(redeclare
         package Medium = CurrentlyChosenMedium)
       annotation (Placement(transformation(extent={{40,-84},{60,-64}})));
-    Physiolibrary.Fluid.Sensors.FlowMeasure flowMeasure(redeclare package Medium =
+    Physiolibrary.Fluid.Sensors.FlowMeasure flowMeasure(redeclare package
+        Medium =
           CurrentlyChosenMedium)                        annotation (Placement(
           transformation(
           extent={{10,-10},{-10,10}},
@@ -77,8 +78,8 @@ package ModelicaHackathonPoriz
         redeclare package Medium = CurrentlyChosenMedium)
       annotation (Placement(transformation(extent={{38,82},{58,102}})));
     Physiolibrary.Fluid.Sensors.PressureMeasure pressure_veins(redeclare
-        package
-        Medium = CurrentlyChosenMedium)
+        package Medium =
+                 CurrentlyChosenMedium)
       annotation (Placement(transformation(extent={{-130,-52},{-110,-32}})));
     Physiolibrary.Fluid.Sensors.PressureMeasure pressure_pulmonary_arteries(
         redeclare package Medium = CurrentlyChosenMedium)
@@ -112,12 +113,12 @@ package ModelicaHackathonPoriz
           rotation=90,
           origin={-40,-90})));
     Physiolibrary.Fluid.Components.Resistor systemic_resitance1(redeclare
-        package
-        Medium = CurrentlyChosenMedium, Resistance=7999343.2449*(20*1/8))
+        package Medium =
+                 CurrentlyChosenMedium, Resistance=7999343.2449*(20*1/8))
       annotation (Placement(transformation(extent={{-68,-64},{-48,-44}})));
     Physiolibrary.Fluid.Components.Resistor systemic_resitance2(redeclare
-        package
-        Medium = CurrentlyChosenMedium, Resistance=7999343.2449*(20*7/8))
+        package Medium =
+                 CurrentlyChosenMedium, Resistance=7999343.2449*(20*7/8))
       annotation (Placement(transformation(extent={{-30,-64},{-10,-44}})));
     Physiolibrary.Fluid.Sensors.PressureMeasure pressure_systemic_capillaries(
         redeclare package Medium = CurrentlyChosenMedium)
@@ -125,7 +126,8 @@ package ModelicaHackathonPoriz
     Physiolibrary.Fluid.Sources.PressureSource inspiredAir(redeclare package
         Medium = Physiolibrary.Media.Air)
       annotation (Placement(transformation(extent={{-138,226},{-118,246}})));
-    Physiolibrary.Fluid.Components.VolumePump deadspace(redeclare package Medium =
+    Physiolibrary.Fluid.Components.VolumePump deadspace(redeclare package
+        Medium =
           Physiolibrary.Media.Air,
       useSolutionFlowInput=true,   SolutionFlow=DV*RR)
       annotation (Placement(transformation(extent={{-10,-10},{10,10}},
@@ -187,7 +189,7 @@ package ModelicaHackathonPoriz
           extent={{-10,-10},{10,10}},
           rotation=90,
           origin={86,180})));
-    Modelica.Blocks.Math.Max max1 annotation (Placement(transformation(
+    Modelica.Blocks.Math.Max ventilation annotation (Placement(transformation(
           extent={{-7,-7},{7,7}},
           rotation=90,
           origin={71,209})));
@@ -196,7 +198,8 @@ package ModelicaHackathonPoriz
           extent={{-4,-4},{4,4}},
           rotation=90,
           origin={66,192})));
-    Modelica.Blocks.Math.Gain deadspace_m_gain(k=50/(2 - 0.35)) annotation (
+    Modelica.Blocks.Math.Gain deadspace_m_gain(k=60/(50/(2 - 0.35)))
+                                                                annotation (
         Placement(transformation(
           extent={{-4,-4},{4,4}},
           rotation=90,
@@ -210,7 +213,8 @@ package ModelicaHackathonPoriz
           extent={{-4,-4},{4,4}},
           rotation=90,
           origin={166,184})));
-    Modelica.Blocks.Math.Division division annotation (Placement(transformation(
+    Modelica.Blocks.Math.Division respirationRate annotation (Placement(
+          transformation(
           extent={{-6,-6},{6,6}},
           rotation=90,
           origin={156,250})));
@@ -228,7 +232,7 @@ package ModelicaHackathonPoriz
           extent={{-4,-4},{4,4}},
           rotation=90,
           origin={174,206})));
-    Modelica.Blocks.Math.Min min1 annotation (Placement(transformation(
+    Modelica.Blocks.Math.Min tidalVolume annotation (Placement(transformation(
           extent={{-5,-5},{5,5}},
           rotation=90,
           origin={161,229})));
@@ -374,32 +378,35 @@ package ModelicaHackathonPoriz
     connect(add.u1, pCO2_arterial_pressure.partialPressure) annotation (Line(
           points={{74.8,146.6},{66,146.6},{66,-42},{68,-42},{68,-50},{60,-50}},
           color={0,0,127}));
-    connect(max1.y, totalRespiration.solutionFlow) annotation (Line(points={{71,216.7},
-            {70,216.7},{70,220},{52,220},{52,231}}, color={0,0,127}));
-    connect(max1.u2, product3.y) annotation (Line(points={{75.2,200.6},{86,200.6},
-            {86,191}}, color={0,0,127}));
-    connect(const.y, max1.u1)
+    connect(ventilation.y, totalRespiration.solutionFlow) annotation (Line(
+          points={{71,216.7},{70,216.7},{70,220},{52,220},{52,231}}, color={0,0,
+            127}));
+    connect(ventilation.u2, product3.y) annotation (Line(points={{75.2,200.6},{
+            86,200.6},{86,191}}, color={0,0,127}));
+    connect(const.y, ventilation.u1)
       annotation (Line(points={{66,196.4},{66.8,200.6}}, color={0,0,127}));
     connect(deadspace_c.y, add1.u2) annotation (Line(points={{166,189},{176,189},{
             176,198.8},{161.6,198.8}}, color={0,0,127}));
-    connect(deadspace_m_gain.u, product3.y) annotation (Line(points={{154,179.2},{
-            154,172},{102,172},{102,200},{86,200},{86,191}}, color={0,0,127}));
     connect(add1.u1, deadspace_m_gain.y) annotation (Line(points={{154.4,198.8},{142,
             198.8},{142,188.4},{154,188.4}}, color={0,0,127}));
-    connect(division.u1, product3.y) annotation (Line(points={{152.4,242.8},{86,242.8},
-            {86,191}}, color={0,0,127}));
     connect(base_deadspace_volume.y, RR_multiply.u2) annotation (Line(points={{171,
             272},{171,275.2},{153.4,275.2}}, color={0,0,127}));
-    connect(division.y, RR_multiply.u1) annotation (Line(points={{156,256.6},{168,
-            256.6},{168,264},{160,264},{160,266.8},{153.4,266.8}}, color={0,0,127}));
+    connect(respirationRate.y, RR_multiply.u1) annotation (Line(points={{156,
+            256.6},{168,256.6},{168,264},{160,264},{160,266.8},{153.4,266.8}},
+          color={0,0,127}));
     connect(RR_multiply.y, deadspace.solutionFlow) annotation (Line(points={{137.3,
             271},{-46,271},{-46,263}}, color={0,0,127}));
-    connect(min1.u1, add1.y)
+    connect(tidalVolume.u1, add1.y)
       annotation (Line(points={{158,223},{158,212.6}}, color={0,0,127}));
-    connect(min1.y, division.u2) annotation (Line(points={{161,234.5},{159.6,234.5},
-            {159.6,242.8}}, color={0,0,127}));
-    connect(volume.y, min1.u2)
-      annotation (Line(points={{174,211},{174,223},{164,223}}, color={0,0,127}));
+    connect(tidalVolume.y, respirationRate.u2) annotation (Line(points={{161,
+            234.5},{159.6,234.5},{159.6,242.8}}, color={0,0,127}));
+    connect(volume.y, tidalVolume.u2) annotation (Line(points={{174,211},{174,
+            223},{164,223}}, color={0,0,127}));
+    connect(ventilation.y, deadspace_m_gain.u) annotation (Line(points={{71,
+            216.7},{71,234},{132,234},{132,170},{154,170},{154,179.2}}, color={
+            0,0,127}));
+    connect(ventilation.y, respirationRate.u1) annotation (Line(points={{71,
+            216.7},{71,234},{152.4,234},{152.4,242.8}}, color={0,0,127}));
     annotation (Diagram(coordinateSystem(extent={{-240,-200},{220,360}}),
           graphics={
           Rectangle(
@@ -805,8 +812,8 @@ package ModelicaHackathonPoriz
   end AlveolarUnit;
   annotation (uses(
       Modelica(version="4.0.0"),
-      Physiolibrary(version="3.0.0-alpha7"),
-      Chemical(version="1.4.0-alpha7")),
+      Physiolibrary(version="3.0.0-alpha8"),
+      Chemical(version="1.4.0")),
     version="1",
     conversion(noneFromVersion=""));
 end ModelicaHackathonPoriz;
