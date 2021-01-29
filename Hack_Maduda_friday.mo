@@ -101,10 +101,11 @@ package Hack_Maduda_friday
     Physiolibrary.Fluid.Interfaces.FluidPort_b SystemicCapillariesIn(redeclare
         package Medium = Physiolibrary.Media.BloodBySiggaardAndersen)
       annotation (Placement(transformation(extent={{-74,-110},{-54,-90}})));
-    Physiolibrary.Fluid.Sensors.PartialPressure paCO2(redeclare package
-        stateOfMatter = Chemical.Interfaces.IdealGas, redeclare package Medium
-        = Physiolibrary.Media.BloodBySiggaardAndersen) annotation (Placement(
-          transformation(
+    Physiolibrary.Fluid.Sensors.PartialPressure paCO2(
+      redeclare package stateOfMatter = Chemical.Interfaces.IdealGas,
+      substanceData=Chemical.Substances.CarbonDioxide_gas(),
+      redeclare package Medium = Physiolibrary.Media.BloodBySiggaardAndersen)
+      annotation (Placement(transformation(
           extent={{-10,-10},{10,10}},
           rotation=270,
           origin={66,-46})));
@@ -218,9 +219,10 @@ package Hack_Maduda_friday
       useSolutionFlowInput=true,
         SolutionFlow=DV*RR)
       annotation (Placement(transformation(extent={{-18,76},{2,96}})));
-    Physiolibrary.Fluid.Sources.VolumeOutflowSource volumeOutflowSource(
+    Physiolibrary.Fluid.Sources.VolumeOutflowSource VentilationFlow(
       useSolutionFlowInput=true,
-        SolutionFlow=TV*RR, redeclare package Medium = Air)
+      SolutionFlow=TV*RR,
+      redeclare package Medium = Air)
       annotation (Placement(transformation(extent={{70,50},{90,70}})));
     Physiolibrary.Fluid.Components.Resistor systemicRes(redeclare package
         Medium =
@@ -295,9 +297,15 @@ package Hack_Maduda_friday
           extent={{-10,-10},{10,10}},
           rotation=90,
           origin={184,68})));
+    Modelica.Blocks.Math.Max max1 annotation (Placement(transformation(
+          extent={{-10,-10},{10,10}},
+          rotation=180,
+          origin={118,46})));
+    Modelica.Blocks.Sources.Constant const(k=0)
+      annotation (Placement(transformation(extent={{110,-8},{130,12}})));
   equation
 
-    connect(volumeOutflowSource.q_in, DeadSpace.q_out) annotation (Line(
+    connect(VentilationFlow.q_in, DeadSpace.q_out) annotation (Line(
         points={{70,60},{62,60},{62,86},{2,86}},
         color={127,0,0},
         thickness=0.5));
@@ -354,10 +362,10 @@ package Hack_Maduda_friday
         points={{-16,42},{-16,60},{-82,60}},
         color={127,0,0},
         thickness=0.5));
-    connect(alveolarUnit[i].q_in, volumeOutflowSource.q_in) annotation (Line(
-        points={{2,42},{2,60},{70,60}},
-        color={127,0,0},
-        thickness=0.5));
+      connect(alveolarUnit[i].q_in, VentilationFlow.q_in) annotation (Line(
+          points={{2,42},{2,60},{70,60}},
+          color={127,0,0},
+          thickness=0.5));
     connect(alveolarUnit[i].q_in1, circulation2_1.PulmoCapillariesOut) annotation (
         Line(
         points={{-2,22},{-2,20},{70,20},{70,-28},{-0.944,-28},{-0.944,-40.2}},
@@ -381,9 +389,12 @@ package Hack_Maduda_friday
       annotation (Line(points={{182,35},{184,35},{184,56}}, color={0,0,127}));
     connect(gain.y, DeadSpace.solutionFlow)
       annotation (Line(points={{184,79},{184,93},{-8,93}}, color={0,0,127}));
-    connect(volumeOutflowSource.solutionFlow, product1.y) annotation (Line(
-          points={{80,67},{80,76},{142,76},{142,46},{184,46},{184,35},{182,35}},
-          color={0,0,127}));
+    connect(product1.y, max1.u2)
+      annotation (Line(points={{182,35},{182,52},{130,52}}, color={0,0,127}));
+    connect(const.y, max1.u1) annotation (Line(points={{131,2},{144,2},{144,40},
+            {130,40}}, color={0,0,127}));
+    connect(max1.y, VentilationFlow.solutionFlow) annotation (Line(points={{107,
+            46},{100,46},{100,50},{98,50},{98,67},{80,67}}, color={0,0,127}));
     annotation (Icon(coordinateSystem(preserveAspectRatio=false, extent={{-280,
               -200},{240,100}})),
                             Diagram(coordinateSystem(preserveAspectRatio=false,
