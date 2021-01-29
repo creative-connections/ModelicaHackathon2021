@@ -1,6 +1,7 @@
 within ;
 package Hack_Maduda_friday
   model Circulation
+    extends Physiolibrary.Icons.Microcirculation;
     Physiolibrary.Fluid.Components.VolumePump LeftHeart(
       redeclare package Medium = Blood,
       useSolutionFlowInput=true,
@@ -35,7 +36,7 @@ package Hack_Maduda_friday
       volume_start(displayUnit="l") = 0.00085,
       Compliance(displayUnit="ml/mmHg") = 2.6627185942521e-08,
       ZeroPressureVolume(displayUnit="l") = 0.00045,
-      nPorts=3) annotation (Placement(transformation(extent={{20,-54},{40,-34}})));
+      nPorts=4) annotation (Placement(transformation(extent={{20,-54},{40,-34}})));
     Physiolibrary.Fluid.Components.ElasticVessel VeinsBody(
       redeclare package Medium = Blood,
       volume_start(displayUnit="l") = 0.00325,
@@ -90,14 +91,16 @@ package Hack_Maduda_friday
           origin={-48,-48})));
     replaceable package Blood = Physiolibrary.Media.BloodBySiggaardAndersen annotation(choicesAllMatching=true);
     Physiolibrary.Fluid.Interfaces.FluidPort_a SystemicCapOut(redeclare package
-        Medium = Blood) annotation (Placement(transformation(rotation=0, extent={
-              {-27.5,-110},{-2.5,-90}})));
+        Medium = Blood) annotation (Placement(transformation(rotation=0, extent={{18.5,
+              -108},{43.5,-88}}), iconTransformation(extent={{18.5,-108},{43.5,-88}})));
     Physiolibrary.Fluid.Interfaces.FluidPort_a PulmoCapillariesIn(redeclare
         package Medium = Blood) annotation (Placement(transformation(rotation=0,
-            extent={{-53.5,88},{-28.5,108}})));
+            extent={{-71.5,86},{-46.5,106}}), iconTransformation(extent={{-71.5,86},
+              {-46.5,106}})));
     Physiolibrary.Fluid.Interfaces.FluidPort_b PulmoCapillariesOut(redeclare
         package Medium = Physiolibrary.Media.BloodBySiggaardAndersen)
-      annotation (Placement(transformation(extent={{-14,88},{6,108}})));
+      annotation (Placement(transformation(extent={{16,88},{36,108}}),
+          iconTransformation(extent={{16,88},{36,108}})));
     Physiolibrary.Fluid.Interfaces.FluidPort_b SystemicCapillariesIn(redeclare
         package Medium = Physiolibrary.Media.BloodBySiggaardAndersen)
       annotation (Placement(transformation(extent={{-74,-110},{-54,-90}})));
@@ -110,7 +113,17 @@ package Hack_Maduda_friday
           rotation=270,
           origin={66,-46})));
     Physiolibrary.Types.RealIO.PressureOutput PartialPressureCO2_arteries
-      annotation (Placement(transformation(extent={{106,-12},{126,8}})));
+      annotation (Placement(transformation(extent={{106,34},{126,54}})));
+    Physiolibrary.Fluid.Sensors.PartialPressure paO2(
+      redeclare package stateOfMatter = Chemical.Interfaces.IdealGas,
+      substanceData=Chemical.Substances.Oxygen_gas(),
+      redeclare package Medium = Physiolibrary.Media.BloodBySiggaardAndersen)
+      annotation (Placement(transformation(
+          extent={{-10,-10},{10,10}},
+          rotation=270,
+          origin={86,-74})));
+    Physiolibrary.Types.RealIO.PressureOutput PartialPressureO2_arteries
+      annotation (Placement(transformation(extent={{106,-54},{126,-34}})));
   equation
     connect(LeftHeart.q_in,VeinsPulmo. q_in[1]) annotation (Line(
         points={{30,24},{30,71.7333},{29.9,71.7333}},
@@ -121,7 +134,7 @@ package Hack_Maduda_friday
         color={127,0,0},
         thickness=0.5));
     connect(flowRight.q_out,ArteriesBody. q_in[1]) annotation (Line(
-        points={{30,-28},{29.9,-42.2667}},
+        points={{30,-28},{29.9,-42.05}},
         color={127,0,0},
         thickness=0.5));
     connect(pressureMeasureVP.q_in,VeinsPulmo. q_in[2]) annotation (Line(
@@ -172,26 +185,37 @@ package Hack_Maduda_friday
         color={127,0,0},
         thickness=0.5));
     connect(PulmoCapillariesIn, ArteriesPulmo.q_in[3]) annotation (Line(
-        points={{-41,98},{-40,98},{-40,66.2667},{-74.1,66.2667}},
+        points={{-59,96},{-40,96},{-40,66.2667},{-74.1,66.2667}},
         color={127,0,0},
         thickness=0.5));
     connect(PulmoCapillariesOut, VeinsPulmo.q_in[3]) annotation (Line(
-        points={{-4,98},{-24,98},{-24,68.2667},{29.9,68.2667}},
+        points={{26,98},{-24,98},{-24,68.2667},{29.9,68.2667}},
         color={127,0,0},
         thickness=0.5));
     connect(SystemicCapOut, ArteriesBody.q_in[2]) annotation (Line(
-        points={{-15,-100},{-15,-44},{29.9,-44}},
+        points={{31,-98},{31,-43.35},{29.9,-43.35}},
         color={127,0,0},
         thickness=0.5));
     connect(paCO2.referenceFluidPort, ArteriesBody.q_in[3]) annotation (Line(
-        points={{56.2,-46},{42,-46},{42,-45.7333},{29.9,-45.7333}},
+        points={{56.2,-46},{42,-46},{42,-44.65},{29.9,-44.65}},
         color={127,0,0},
         thickness=0.5));
     connect(paCO2.port_a, ArteriesBody.substances[3]) annotation (Line(points={
             {66,-56},{66,-66},{8,-66},{8,-44},{20,-44}}, color={158,66,200}));
     connect(paCO2.partialPressure, PartialPressureCO2_arteries) annotation (
-        Line(points={{66,-36},{68,-36},{68,-2},{116,-2},{116,-2}}, color={0,0,
+        Line(points={{66,-36},{66,-16},{98,-16},{98,42},{108,42},{108,44},{116,
+            44}},                                                  color={0,0,
             127}));
+    connect(PartialPressureCO2_arteries, PartialPressureCO2_arteries)
+      annotation (Line(points={{116,44},{116,44}}, color={0,0,127}));
+    connect(paO2.referenceFluidPort, ArteriesBody.q_in[4]) annotation (Line(
+        points={{76.2,-74},{29.9,-74},{29.9,-45.95}},
+        color={127,0,0},
+        thickness=0.5));
+    connect(paO2.port_a, ArteriesBody.substances[2]) annotation (Line(points={{
+            86,-84},{-2,-84},{-2,-44},{20,-44}}, color={158,66,200}));
+    connect(paO2.partialPressure, PartialPressureO2_arteries) annotation (Line(
+          points={{86,-64},{86,-44},{116,-44},{116,-44}}, color={0,0,127}));
     annotation (
       Diagram(coordinateSystem(extent={{-140,-100},{110,100}})),
       Icon(coordinateSystem(extent={{-140,-100},{110,100}})));
@@ -213,28 +237,36 @@ package Hack_Maduda_friday
     parameter Integer NA=10  "Number of Alveolar Unit";
     Physiolibrary.Fluid.Sources.PressureSource pressureSource(redeclare package
         Medium = Air)
-      annotation (Placement(transformation(extent={{-196,4},{-176,24}})));
+      annotation (Placement(transformation(extent={{-116,2},{-96,22}})));
     Physiolibrary.Fluid.Components.VolumePump DeadSpace(
       redeclare package Medium = Air,
-      useSolutionFlowInput=true)
-      annotation (Placement(transformation(extent={{-112,30},{-92,50}})));
+      useSolutionFlowInput=true,
+      q_out(p(start=101277.72470869822)))
+      annotation (Placement(transformation(extent={{-54,20},{-34,40}})));
     Physiolibrary.Fluid.Sources.VolumeOutflowSource VentilationFlow(
       useSolutionFlowInput=true,
-      redeclare package Medium = Air)
-      annotation (Placement(transformation(extent={{-24,4},{-4,24}})));
+      redeclare package Medium = Air,
+      density(start=1.191923596163783))
+      annotation (Placement(transformation(extent={{8,2},{28,22}})));
     Physiolibrary.Fluid.Components.Resistor systemicRes(redeclare package
         Medium =
           Physiolibrary.Media.BloodBySiggaardAndersen, Resistance=7999343.2449*
           (20*(7/8)))
-      annotation (Placement(transformation(extent={{-64,-138},{-44,-118}})));
+      annotation (Placement(transformation(extent={{-4,-138},{16,-118}})));
     Physiolibrary.Fluid.Components.ElasticVessel SystemCapillaries(
       redeclare package Medium = Physiolibrary.Media.BloodBySiggaardAndersen,
       useSubstances=true,
       volume_start(displayUnit="l") = 0.0003,
       Compliance(displayUnit="ml/mmHg") = 3.0002463033826e-08,
       ZeroPressureVolume(displayUnit="l") = 0.0002,
-      nPorts=4)
-      annotation (Placement(transformation(extent={{-130,-160},{-110,-140}})));
+      nPorts=4,
+      chemicalSolution(bloodGases(
+          cHCO3(start=24.52399716789123),
+          pCO(start=9.996918220973395E-06),
+          pCO2(start=5332.920352860495),
+          sCO(start=1.8089495849532384E-07),
+          sO2CO(start=0.9627736405069439))))
+      annotation (Placement(transformation(extent={{-70,-160},{-50,-140}})));
     Chemical.Sources.SubstanceInflowT CO2Production(
       SubstanceFlow(displayUnit="mmol/min") = 0.00020566666666667,
       redeclare package stateOfMatter = Chemical.Interfaces.IdealGas,
@@ -242,14 +274,19 @@ package Hack_Maduda_friday
         Placement(transformation(
           extent={{-10,-10},{10,10}},
           rotation=180,
-          origin={-52,-186})));
+          origin={-2,-186})));
     Chemical.Sources.SubstanceOutflow O2Consumption(SubstanceFlow(displayUnit="mmol/min")=
            0.00025666666666667) annotation (Placement(transformation(
           extent={{-10,-10},{10,10}},
           rotation=180,
-          origin={-198,-150})));
-    Circulation circulation2_1
-      annotation (Placement(transformation(extent={{-110,-108},{-86,-88}})));
+          origin={-106,-150})));
+    Circulation circulation(ArteriesBody(chemicalSolution(bloodGases(
+            cHCO3(start=24.52399716789123),
+            pCO(start=9.996918220972615E-06),
+            pCO2(start=5332.920352860494),
+            sCO(start=1.8089495849532384E-07),
+            sO2CO(start=0.9627736405069454)))))
+      annotation (Placement(transformation(extent={{-64,-110},{-22,-76}})));
     Physiolibrary.Fluid.Sensors.PartialPressure pCO2_tissue(
       redeclare package stateOfMatter = Chemical.Interfaces.IdealGas,
       substanceData=Chemical.Substances.CarbonDioxide_gas(),
@@ -257,125 +294,150 @@ package Hack_Maduda_friday
       annotation (Placement(transformation(
           extent={{-10,-10},{10,10}},
           rotation=0,
-          origin={10,-136})));
+          origin={66,-134})));
     Physiolibrary.Fluid.Sensors.PartialPressure pO2_tissue(
       redeclare package stateOfMatter = Chemical.Interfaces.IdealGas,
       substanceData=Chemical.Substances.Oxygen_gas(),
       redeclare package Medium = Physiolibrary.Media.BloodBySiggaardAndersen)
-      annotation (Placement(transformation(extent={{-246,-124},{-226,-104}})));
+      annotation (Placement(transformation(extent={{-102,-114},{-82,-94}})));
     Physiolibrary.Fluid.Components.Conductor shunt(redeclare package Medium =
           Physiolibrary.Media.BloodBySiggaardAndersen, Conductance=c_shunt)
-      annotation (Placement(transformation(extent={{-116,-62},{-96,-42}})));
+      annotation (Placement(transformation(extent={{-56,-62},{-36,-42}})));
     AlveolarUnit alveolarUnit[NA](
       redeclare package Air = Air,
       C_ventilation=ones(NA)*(c_TotalVentilation/NA),
-      C_circulation=ones(NA)*(c_TotalPerfusion/NA))
+      C_circulation=ones(NA)*(c_TotalPerfusion/NA),
+      PulmoCapillaries(chemicalSolution(bloodGases(
+            cHCO3(start={24.52399716789123,24.52399716789123,24.52399716789123,
+                  24.52399716789123,24.52399716789123,24.52399716789123,
+                  24.52399716789123,24.52399716789123,24.52399716789123,
+                  24.52399716789123}),
+            pCO(start={9.996918220973395E-06,9.996918220973395E-06,
+                  9.996918220973395E-06,9.996918220973395E-06,
+                  9.996918220973395E-06,9.996918220973395E-06,
+                  9.996918220973395E-06,9.996918220973395E-06,
+                  9.996918220973395E-06,9.996918220973395E-06}),
+            pCO2(start={5332.920352860495,5332.920352860495,5332.920352860495,
+                  5332.920352860495,5332.920352860495,5332.920352860495,
+                  5332.920352860495,5332.920352860495,5332.920352860495,
+                  5332.920352860495}),
+            sCO(start={1.8089495849532384E-07,1.8089495849532384E-07,
+                  1.8089495849532384E-07,1.8089495849532384E-07,
+                  1.8089495849532384E-07,1.8089495849532384E-07,
+                  1.8089495849532384E-07,1.8089495849532384E-07,
+                  1.8089495849532384E-07,1.8089495849532384E-07}),
+            sO2CO(start={0.9627736405069439,0.9627736405069439,
+                  0.9627736405069439,0.9627736405069439,0.9627736405069439,
+                  0.9627736405069439,0.9627736405069439,0.9627736405069439,
+                  0.9627736405069439,0.9627736405069439})))))
                                           annotation (Placement(transformation(
-            rotation=0, extent={{-114,-26},{-94,-6}})));
+            rotation=0, extent={{-66,-38},{-28,0}})));
     VentRegulation ventRegulation annotation (Placement(transformation(rotation=
-             0, extent={{154,-50},{174,-30}})));
+             0, extent={{52,30},{72,50}})));
     Modelica.Blocks.Math.Product product1 annotation (Placement(transformation(
           extent={{-10,-10},{10,10}},
           rotation=180,
-          origin={-58,76})));
+          origin={2,76})));
     Physiolibrary.Types.Constants.VolumeConst VD(k(displayUnit="l") = DV)
       annotation (Placement(transformation(
           extent={{-4,-4},{4,4}},
           rotation=180,
-          origin={-18,82})));
+          origin={42,82})));
   equation
 
     connect(VentilationFlow.q_in, DeadSpace.q_out) annotation (Line(
-        points={{-24,14},{-32,14},{-32,40},{-92,40}},
+        points={{8,12},{-12,12},{-12,30},{-34,30}},
         color={127,0,0},
         thickness=0.5));
     connect(DeadSpace.q_in, pressureSource.y) annotation (Line(
-        points={{-112,40},{-166,40},{-166,14},{-176,14}},
+        points={{-54,30},{-86,30},{-86,12},{-96,12}},
         color={127,0,0},
         thickness=0.5));
     connect(systemicRes.q_out, SystemCapillaries.q_in[1]) annotation (Line(
-        points={{-44,-128},{-20,-128},{-20,-148.05},{-120.1,-148.05}},
+        points={{16,-128},{40,-128},{40,-148.05},{-60.1,-148.05}},
         color={127,0,0},
         thickness=0.5));
-    connect(SystemCapillaries.substances[2], O2Consumption.port_a)
-      annotation (Line(points={{-130,-150},{-188,-150}},
-                                                       color={158,66,200}));
-    connect(CO2Production.port_b, SystemCapillaries.substances[3]) annotation (
-        Line(points={{-62,-186},{-172,-186},{-172,-150},{-130,-150}},
-                                                                  color={158,66,200}));
-    connect(circulation2_1.SystemicCapOut, systemicRes.q_in) annotation (Line(
-        points={{-98,-108},{-98,-128},{-64,-128}},
+    connect(circulation.SystemicCapOut, systemicRes.q_in) annotation (Line(
+        points={{-35.272,-109.66},{-34,-109.66},{-34,-128},{-4,-128}},
         color={127,0,0},
         thickness=0.5));
-    connect(circulation2_1.SystemicCapillariesIn, SystemCapillaries.q_in[2])
+    connect(circulation.SystemicCapillariesIn, SystemCapillaries.q_in[2])
       annotation (Line(
-        points={{-102.704,-108},{-102.704,-149.35},{-120.1,-149.35}},
+        points={{-51.232,-110},{-52,-110},{-52,-122},{-58,-122},{-58,-136},{
+            -60.1,-136},{-60.1,-149.35}},
         color={127,0,0},
         thickness=0.5));
 
-    connect(CO2Production.port_b, pCO2_tissue.port_a) annotation (Line(points={{-62,
-            -186},{-88,-186},{-88,-172},{30,-172},{30,-136},{20,-136}},
+    connect(CO2Production.port_b, pCO2_tissue.port_a) annotation (Line(points={{-12,
+            -186},{-34,-186},{-34,-170},{76,-170},{76,-134}},
                          color={158,66,200}));
     connect(pCO2_tissue.referenceFluidPort, SystemCapillaries.q_in[3])
       annotation (Line(
-        points={{10,-145.8},{10,-150},{-120.1,-150},{-120.1,-150.65}},
+        points={{66,-143.8},{66,-150},{-60.1,-150},{-60.1,-150.65}},
         color={127,0,0},
         thickness=0.5));
-    connect(pO2_tissue.port_a, O2Consumption.port_a) annotation (Line(points={{-226,
-            -114},{-172,-114},{-172,-150},{-188,-150}},
-                                                     color={158,66,200}));
     connect(pO2_tissue.referenceFluidPort, SystemCapillaries.q_in[4]) annotation (
        Line(
-        points={{-236,-123.8},{-236,-128},{-120,-128},{-120,-126},{-120.1,-126},{-120.1,
-            -151.95}},
+        points={{-92,-113.8},{-92,-124},{-58,-124},{-58,-136},{-60.1,-136},{
+            -60.1,-151.95}},
         color={127,0,0},
         thickness=0.5));
 
-    connect(shunt.q_out, circulation2_1.PulmoCapillariesOut) annotation (Line(
-        points={{-96,-52},{-30,-52},{-30,-76},{-96.944,-76},{-96.944,-88.2}},
+    connect(shunt.q_out, circulation.PulmoCapillariesOut) annotation (Line(
+        points={{-36,-52},{-22,-52},{-22,-76.34},{-36.112,-76.34}},
         color={127,0,0},
         thickness=0.5));
 
-    connect(circulation2_1.PulmoCapillariesIn, shunt.q_in) annotation (Line(
-        points={{-100.496,-88.2},{-100.496,-82},{-190,-82},{-190,-52},{-116,-52}},
-        color={127,0,0},
-        thickness=0.5));
     for i in 1:NA loop
     connect(alveolarUnit[i].q_in3, pressureSource.y) annotation (Line(
-        points={{-112,-6},{-112,14},{-176,14}},
+        points={{-55.36,0},{-54,0},{-54,12},{-96,12}},
         color={127,0,0},
         thickness=0.5));
       connect(alveolarUnit[i].q_in, VentilationFlow.q_in) annotation (Line(
-          points={{-94,-6},{-94,14},{-24,14}},
+          points={{-39.02,-0.76},{-38,-0.76},{-38,12},{8,12}},
           color={127,0,0},
           thickness=0.5));
-    connect(alveolarUnit[i].q_in1, circulation2_1.PulmoCapillariesOut) annotation (
-        Line(
-        points={{-98,-26},{-98,-28},{-26,-28},{-26,-76},{-96.944,-76},{-96.944,-88.2}},
-        color={127,0,0},
-        thickness=0.5));
-    connect(alveolarUnit[i].q_in2, circulation2_1.PulmoCapillariesIn) annotation (
-        Line(
-        points={{-108,-26},{-108,-28},{-196,-28},{-196,-88.2},{-100.496,-88.2}},
-        color={127,0,0},
-        thickness=0.5));
+      connect(alveolarUnit[i].q_in1, circulation.PulmoCapillariesOut)
+        annotation (Line(
+          points={{-38.26,-38},{-22,-38},{-22,-76.34},{-36.112,-76.34}},
+          color={127,0,0},
+          thickness=0.5));
+      connect(alveolarUnit[i].q_in2, circulation.PulmoCapillariesIn)
+        annotation (Line(
+          points={{-55.36,-38},{-72,-38},{-72,-78},{-50.392,-78},{-50.392,
+              -76.68}},
+          color={127,0,0},
+          thickness=0.5));
     end for;
-    connect(circulation2_1.PartialPressureCO2_arteries, ventRegulation.paCO2)
-      annotation (Line(points={{-85.424,-98.2},{170,-98.2},{170,-49.875},{
-            170.111,-49.875}},
-          color={0,0,127}));
-    connect(ventRegulation.Vv, VentilationFlow.solutionFlow) annotation (Line(
-          points={{152.444,-33.25},{14,-33.25},{14,21},{-14,21}}, color={0,0,127}));
-    connect(ventRegulation.RR, product1.u1) annotation (Line(points={{152.444,
-            -40.5},{64,-40.5},{64,70},{-46,70}}, color={0,0,127}));
+    connect(circulation.PartialPressureCO2_arteries, ventRegulation.paCO2)
+      annotation (Line(points={{-20.992,-85.52},{60,-85.52},{60,20},{60.1111,20},
+            {60.1111,30.125}}, color={0,0,127}));
+    connect(ventRegulation.RR, product1.u1) annotation (Line(points={{66,52.25},
+            {64,52.25},{64,70},{14,70}}, color={0,0,127}));
     connect(VD.y, product1.u2)
-      annotation (Line(points={{-23,82},{-46,82}}, color={0,0,127}));
-    connect(DeadSpace.solutionFlow, product1.y) annotation (Line(points={{-102,
-            47},{-100,47},{-100,76},{-69,76}}, color={0,0,127}));
-    annotation (Icon(coordinateSystem(preserveAspectRatio=false, extent={{-280,
-              -200},{240,100}})),
+      annotation (Line(points={{37,82},{14,82}}, color={0,0,127}));
+    connect(DeadSpace.solutionFlow, product1.y)
+      annotation (Line(points={{-44,37},{-44,76},{-9,76}}, color={0,0,127}));
+    connect(ventRegulation.Vv, VentilationFlow.solutionFlow) annotation (Line(
+          points={{51.5556,46.75},{18,46.75},{18,19}}, color={0,0,127}));
+    connect(shunt.q_in, circulation.PulmoCapillariesIn) annotation (Line(
+        points={{-56,-52},{-72,-52},{-72,-78},{-50.392,-78},{-50.392,-76.68}},
+        color={127,0,0},
+        thickness=0.5));
+    connect(pO2_tissue.port_a, O2Consumption.port_a) annotation (Line(points={{
+            -82,-104},{-74,-104},{-74,-134},{-86,-134},{-86,-150},{-96,-150}},
+          color={158,66,200}));
+    connect(SystemCapillaries.substances[3], CO2Production.port_b) annotation (
+        Line(points={{-70,-150},{-70,-186},{-12,-186}}, color={158,66,200}));
+    connect(SystemCapillaries.substances[2], O2Consumption.port_a)
+      annotation (Line(points={{-70,-150},{-96,-150}}, color={158,66,200}));
+    connect(circulation.PartialPressureO2_arteries, ventRegulation.paO2)
+      annotation (Line(points={{-20.992,-100.48},{69.4444,-100.48},{69.4444,
+            30.125}}, color={0,0,127}));
+    annotation (Icon(coordinateSystem(preserveAspectRatio=false, extent={{-220,
+              -200},{180,100}})),
                             Diagram(coordinateSystem(preserveAspectRatio=false,
-            extent={{-280,-200},{240,100}})),
+            extent={{-220,-200},{180,100}})),
       experiment(StopTime=600, __Dymola_Algorithm="Dassl"));
   end WholeModel;
 
@@ -1025,6 +1087,7 @@ package Hack_Maduda_friday
   end Circulation_old;
 
   model AlveolarUnit
+    extends Physiolibrary.Icons.Lungs;
     Physiolibrary.Fluid.Components.ElasticVessel Alveols(
       redeclare package Medium = Air,
       useSubstances=true,
@@ -1088,17 +1151,19 @@ package Hack_Maduda_friday
     parameter Physiolibrary.Types.HydraulicConductance C_circulation=
         1.250102626409427e-07*(1/3);
     Physiolibrary.Fluid.Interfaces.FluidPorts_a q_in(redeclare package Medium =
-          Air) annotation (Placement(transformation(rotation=0, extent={{90,80},{110,
-              100}})));
+          Air) annotation (Placement(transformation(rotation=0, extent={{32,76},
+              {52,96}}), iconTransformation(extent={{32,76},{52,96}})));
     Physiolibrary.Fluid.Interfaces.FluidPort_a q_in1(redeclare package Medium =
           Physiolibrary.Media.BloodBySiggaardAndersen) annotation (Placement(
-          transformation(rotation=0, extent={{50,-120},{70,-100}})));
+          transformation(rotation=0, extent={{36,-120},{56,-100}}),
+          iconTransformation(extent={{36,-120},{56,-100}})));
     Physiolibrary.Fluid.Interfaces.FluidPort_a q_in2(redeclare package Medium =
           Physiolibrary.Media.BloodBySiggaardAndersen) annotation (Placement(
-          transformation(rotation=0, extent={{-50,-120},{-30,-100}})));
+          transformation(rotation=0, extent={{-54,-120},{-34,-100}}),
+          iconTransformation(extent={{-54,-120},{-34,-100}})));
     Physiolibrary.Fluid.Interfaces.FluidPort_a q_in3(redeclare package Medium =
-          Air) annotation (Placement(transformation(rotation=0, extent={{-90,80},{
-              -70,100}})));
+          Air) annotation (Placement(transformation(rotation=0, extent={{-54,80},
+              {-34,100}}), iconTransformation(extent={{-54,80},{-34,100}})));
     Physiolibrary.Fluid.Components.Conductor conductor_out(redeclare package
         Medium = Air, Conductance(displayUnit="l/(cmH2O.s)") = C_ventilation)
       annotation (Placement(transformation(extent={{46,62},{66,82}})));
@@ -1133,12 +1198,13 @@ package Hack_Maduda_friday
         points={{70,-11.8},{70,-49.9},{-6.65,-49.9}},
         color={127,0,0},
         thickness=0.5));
-    connect(q_in2, PulmonaryCon.q_in) annotation (Line(points={{-40,-110},{-40,-90},
-            {-54,-90}}, color={127,0,0}));
+    connect(q_in2, PulmonaryCon.q_in) annotation (Line(points={{-44,-110},{-44,
+            -90},{-54,-90}},
+                        color={127,0,0}));
     connect(q_in3, conductor_in.q_in)
-      annotation (Line(points={{-80,90},{-80,70},{-46,70}}, color={127,0,0}));
+      annotation (Line(points={{-44,90},{-44,70},{-46,70}}, color={127,0,0}));
     connect(PulmoVeins.q_out, q_in1) annotation (Line(
-        points={{48,-88},{60,-88},{60,-110}},
+        points={{48,-88},{46,-88},{46,-110}},
         color={127,0,0},
         thickness=0.5));
     connect(PulmoVeins.q_in, PulmoCapillaries.q_in[4]) annotation (Line(
@@ -1150,7 +1216,7 @@ package Hack_Maduda_friday
         color={127,0,0},
         thickness=0.5));
     connect(conductor_out.q_out, q_in) annotation (Line(
-        points={{66,72},{100,72},{100,90}},
+        points={{66,72},{42,72},{42,86}},
         color={127,0,0},
         thickness=0.5));
     annotation (Diagram(coordinateSystem(extent={{-100,-110},{100,90}})), Icon(
@@ -1158,120 +1224,169 @@ package Hack_Maduda_friday
   end AlveolarUnit;
 
   model VentRegulation
+    extends Physiolibrary.Icons.RespiratoryCenter;
     Physiolibrary.Types.Constants.PressureConst pressure(k(displayUnit="kPa")=
            4800) annotation (Placement(transformation(
           extent={{-4,-4},{4,4}},
           rotation=90,
-          origin={38,-66})));
-    Modelica.Blocks.Math.Add add(k2=-1) annotation (Placement(transformation(
+          origin={-34,-66})));
+    Modelica.Blocks.Math.Add x(k2=-1) annotation (Placement(transformation(
           extent={{-10,-10},{10,10}},
           rotation=90,
-          origin={32,-40})));
-    Physiolibrary.Types.Constants.HydraulicConductanceConst
-      hydraulicConductance(k(displayUnit="ml/(kPa.min)") = 2.5e-07) annotation (
-       Placement(transformation(
-          extent={{-4,-4},{4,4}},
+          origin={-40,-40})));
+    Modelica.Blocks.Math.Product Vv_nonregulated annotation (Placement(
+          transformation(
+          extent={{-7,-7},{7,7}},
           rotation=90,
-          origin={48,-28})));
-    Modelica.Blocks.Math.Product product1 annotation (Placement(transformation(
-          extent={{-10,-10},{10,10}},
-          rotation=90,
-          origin={38,10})));
+          origin={37,23})));
     Modelica.Blocks.Math.Max Vv_val annotation (Placement(transformation(
           extent={{-7,-7},{7,7}},
           rotation=180,
-          origin={5,41})));
+          origin={5,49})));
     Modelica.Blocks.Sources.Constant const(k=0)
       annotation (Placement(transformation(extent={{-5,-5},{5,5}},
           rotation=180,
-          origin={25,35})));
+          origin={25,43})));
     Modelica.Blocks.Interfaces.RealInput paCO2 annotation (Placement(
           transformation(
           rotation=90,
           extent={{-19,-19},{19,19}},
-          origin={25,-79}), iconTransformation(
+          origin={-47,-79}),iconTransformation(
           extent={{-19,-19},{19,19}},
           rotation=90,
-          origin={25,-79})));
-    Modelica.Blocks.Interfaces.RealOutput Vv annotation (Placement(
-          transformation(
+          origin={-47,-79})));
+    Modelica.Blocks.Interfaces.RealOutput Vv annotation (Placement(transformation(
           rotation=180,
           extent={{-14,-14},{14,14}},
-          origin={-134,54}), iconTransformation(
+          origin={-124,54}), iconTransformation(
           extent={{-14,-14},{14,14}},
           rotation=180,
-          origin={-134,54})));
+          origin={-124,54})));
     Physiolibrary.Types.Constants.VolumeConst cc(k(displayUnit="l") = 0.00035)
       annotation (Placement(transformation(
           extent={{-4,-4},{4,4}},
           rotation=180,
-          origin={-70,28})));
-    Physiolibrary.Types.Constants.FrequencyConst m(k=0.505) annotation (
-        Placement(transformation(
+          origin={-70,36})));
+    Physiolibrary.Types.Constants.FrequencyConst m(k=0.505) annotation (Placement(
+          transformation(
           extent={{-4,-4},{4,4}},
           rotation=180,
-          origin={-34,32})));
+          origin={-34,40})));
     Modelica.Blocks.Math.Division Vv_m annotation (Placement(transformation(
-          extent={{-7,-7},{7,7}},
-          rotation=180,
-          origin={-57,37})));
+          extent={{7,-7},{-7,7}},
+          rotation=0,
+          origin={-57,45})));
     Modelica.Blocks.Math.Add Vt annotation (Placement(transformation(
           extent={{-7,-7},{7,7}},
           rotation=180,
-          origin={-89,33})));
+          origin={-89,41})));
     Modelica.Blocks.Math.Division RRval annotation (Placement(transformation(
-          extent={{-6,-6},{6,6}},
-          rotation=180,
-          origin={-40,-4})));
-    Modelica.Blocks.Interfaces.RealOutput RR annotation (Placement(
-          transformation(
+          extent={{6,-6},{-6,6}},
+          rotation=0,
+          origin={-80,-8})));
+    Modelica.Blocks.Interfaces.RealOutput RR annotation (Placement(transformation(
           rotation=180,
           extent={{-14,-14},{14,14}},
-          origin={-134,-4}), iconTransformation(
+          origin={-126,-8}), iconTransformation(
           extent={{-14,-14},{14,14}},
-          rotation=180,
-          origin={-134,-4})));
+          rotation=90,
+          origin={6,98})));
     Modelica.Blocks.Math.Min Vt_cond
       annotation (Placement(transformation(extent={{-92,-50},{-78,-36}})));
-    Physiolibrary.Types.Constants.VolumeConst volume(k(displayUnit="l") =
-        0.0023)
+    Physiolibrary.Types.Constants.VolumeConst volume(k(displayUnit="l") = 0.0023)
       annotation (Placement(transformation(extent={{-112,-64},{-104,-56}})));
+    Modelica.Blocks.Interfaces.RealInput paO2 annotation (Placement(
+          transformation(
+          rotation=90,
+          extent={{-19,-19},{19,19}},
+          origin={23,-79}), iconTransformation(
+          extent={{-19,-19},{19,19}},
+          rotation=90,
+          origin={37,-79})));
+    Physiolibrary.Types.Constants.VolumeFlowRateConst W(k(displayUnit="l/min")
+         = 0.001925) annotation (Placement(transformation(
+          extent={{-4,-4},{4,4}},
+          rotation=90,
+          origin={-12,-66})));
+    Physiolibrary.Types.Constants.PressureConst Cp(k(displayUnit="kPa") = 4300)
+      annotation (Placement(transformation(
+          extent={{-4,-4},{4,4}},
+          rotation=90,
+          origin={44,-70})));
+    Modelica.Blocks.Math.Add Pdiff(k2=-1) annotation (Placement(transformation(
+          extent={{-7,-7},{7,7}},
+          rotation=90,
+          origin={29,-43})));
+    Modelica.Blocks.Math.Division slopeVv annotation (Placement(transformation(
+          extent={{-6,-6},{6,6}},
+          rotation=90,
+          origin={-6,-4})));
+    Modelica.Blocks.Math.Min min1 annotation (Placement(transformation(
+          extent={{-7,-7},{7,7}},
+          rotation=90,
+          origin={19,-23})));
+    Physiolibrary.Types.Constants.PressureConst Pmax(k(displayUnit="kPa") = 700)
+      annotation (Placement(transformation(
+          extent={{-4,-4},{4,4}},
+          rotation=90,
+          origin={2,-54})));
   equation
-    connect(pressure.y, add.u2)
-      annotation (Line(points={{38,-61},{38,-52}}, color={0,0,127}));
-    connect(add.y, product1.u1)
-      annotation (Line(points={{32,-29},{32,-2}}, color={0,0,127}));
-    connect(hydraulicConductance.y, product1.u2) annotation (Line(points={{48,-23},
-            {48,-8},{44,-8},{44,-2}},        color={0,0,127}));
-    connect(product1.y, Vv_val.u2) annotation (Line(points={{38,21},{38,45.2},{
-            13.4,45.2}}, color={0,0,127}));
-    connect(paCO2, add.u1)
-      annotation (Line(points={{25,-79},{24,-79},{24,-56},{26,-56},{26,-52}},
+    connect(pressure.y, x.u2)
+      annotation (Line(points={{-34,-61},{-34,-52}},
                                                    color={0,0,127}));
-    connect(Vv_val.u1, const.y) annotation (Line(points={{13.4,36.8},{18,36.8},
-            {18,35},{19.5,35}}, color={0,0,127}));
-    connect(Vv_val.y, Vv_m.u2)
-      annotation (Line(points={{-2.7,41},{-48.6,41.2}}, color={0,0,127}));
-    connect(Vv_m.y, Vt.u2) annotation (Line(points={{-64.7,37},{-76,37},{-76,
-            37.2},{-80.6,37.2}}, color={0,0,127}));
-    connect(m.y, Vv_m.u1) annotation (Line(points={{-39,32},{-48.6,32},{-48.6,
-            32.8}}, color={0,0,127}));
-    connect(cc.y, Vt.u1) annotation (Line(points={{-75,28},{-80.6,28},{-80.6,
-            28.8}}, color={0,0,127}));
-    connect(RRval.u2, Vv_val.y) annotation (Line(points={{-32.8,-0.4},{-32.8,24},
-            {-14,24},{-14,41},{-2.7,41}}, color={0,0,127}));
-    connect(RR, RR)
-      annotation (Line(points={{-134,-4},{-134,-4}}, color={0,0,127}));
-    connect(RR, RRval.y)
-      annotation (Line(points={{-134,-4},{-46.6,-4}}, color={0,0,127}));
-    connect(Vv, Vv_val.y) annotation (Line(points={{-134,54},{-14,54},{-14,41},
-            {-2.7,41}}, color={0,0,127}));
-    connect(Vt.y, Vt_cond.u1) annotation (Line(points={{-96.7,33},{-104,33},{
-            -104,-38.8},{-93.4,-38.8}}, color={0,0,127}));
-    connect(volume.y, Vt_cond.u2) annotation (Line(points={{-103,-60},{-93.4,
-            -60},{-93.4,-47.2}}, color={0,0,127}));
-    connect(Vt_cond.y, RRval.u1) annotation (Line(points={{-77.3,-43},{-18,-43},
-            {-18,-7.6},{-32.8,-7.6}}, color={0,0,127}));
+    connect(x.y, Vv_nonregulated.u1)
+      annotation (Line(points={{-40,-29},{-40,14},{32.8,14},{32.8,14.6}},
+                                                  color={0,0,127}));
+    connect(Vv_nonregulated.y, Vv_val.u2)
+      annotation (Line(points={{37,30.7},{37,53.2},{13.4,53.2}},
+                                                               color={0,0,127}));
+    connect(paCO2, x.u1) annotation (Line(points={{-47,-79},{-48,-79},{-48,-56},
+            {-46,-56},{-46,-52}},
+                       color={0,0,127}));
+    connect(Vv_val.u1, const.y) annotation (Line(points={{13.4,44.8},{18,44.8},
+            {18,43},{19.5,43}},
+                            color={0,0,127}));
+    connect(cc.y, Vt.u1) annotation (Line(points={{-75,36},{-80.6,36},{-80.6,
+            36.8}},
+          color={0,0,127}));
+    connect(Vv, Vv_val.y) annotation (Line(points={{-124,54},{-14,54},{-14,49},
+            {-2.7,49}},
+                  color={0,0,127}));
+    connect(Vt.y, Vt_cond.u1) annotation (Line(points={{-96.7,41},{-104,41},{
+            -104,-38.8},{-93.4,-38.8}},
+                                   color={0,0,127}));
+    connect(volume.y, Vt_cond.u2) annotation (Line(points={{-103,-60},{-93.4,-60},
+            {-93.4,-47.2}}, color={0,0,127}));
+    connect(RRval.u1, Vv_val.y) annotation (Line(points={{-72.8,-4.4},{-72.8,28},
+            {-14,28},{-14,49},{-2.7,49}},
+                                color={0,0,127}));
+    connect(Vt_cond.y, RRval.u2) annotation (Line(points={{-77.3,-43},{-72,-43},
+            {-72,-11.6},{-72.8,-11.6}},
+                                 color={0,0,127}));
+    connect(Vv_m.y, Vt.u2) annotation (Line(points={{-64.7,45},{-80.6,45},{
+            -80.6,45.2}},
+          color={0,0,127}));
+    connect(m.y, Vv_m.u2) annotation (Line(points={{-39,40},{-44,40},{-44,40.8},
+            {-48.6,40.8}},
+                    color={0,0,127}));
+    connect(Vv_m.u1, Vv_val.y) annotation (Line(points={{-48.6,49.2},{-2.7,49.2},
+            {-2.7,49}},color={0,0,127}));
+    connect(RRval.y, RR)
+      annotation (Line(points={{-86.6,-8},{-126,-8}}, color={0,0,127}));
+    connect(paO2, Pdiff.u1) annotation (Line(points={{23,-79},{24.8,-79},{24.8,
+            -51.4}}, color={0,0,127}));
+    connect(Cp.y, Pdiff.u2) annotation (Line(points={{44,-65},{44,-56},{33.2,
+            -56},{33.2,-51.4}}, color={0,0,127}));
+    connect(W.y, slopeVv.u1) annotation (Line(points={{-12,-61},{-10,-61},{-10,
+            -11.2},{-9.6,-11.2}}, color={0,0,127}));
+    connect(Pdiff.y, min1.u2) annotation (Line(points={{29,-35.3},{29,-31.4},{
+            23.2,-31.4}}, color={0,0,127}));
+    connect(Pmax.y, min1.u1) annotation (Line(points={{2,-49},{2,-31.4},{14.8,
+            -31.4}}, color={0,0,127}));
+    connect(min1.y, slopeVv.u2) annotation (Line(points={{19,-15.3},{19,-14},{2,
+            -14},{2,-26},{-2.4,-26},{-2.4,-11.2}}, color={0,0,127}));
+    connect(slopeVv.y, Vv_nonregulated.u2) annotation (Line(points={{-6,2.6},{
+            -6,6},{41.2,6},{41.2,14.6}}, color={0,0,127}));
     annotation (Diagram(coordinateSystem(extent={{-120,-80},{60,80}})),Icon(
           coordinateSystem(extent={{-120,-80},{60,80}})));
   end VentRegulation;
