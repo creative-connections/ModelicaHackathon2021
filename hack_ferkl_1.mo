@@ -26,17 +26,17 @@ package hack_ferkl_1
     Physiolibrary.Fluid.Sources.PressureSource pressureSource(redeclare package
         Medium = Physiolibrary.Media.Air)
       annotation (Placement(transformation(extent={{-138,-30},{-118,-10}})));
-    Physiolibrary.Fluid.Components.VolumePump volumePump(redeclare package
-        Medium =
-          Physiolibrary.Media.Air,
-      useSolutionFlowInput=true,   SolutionFlow=DV*RR)
+    Physiolibrary.Fluid.Components.VolumePump DeadSpace(
+      redeclare package Medium = Physiolibrary.Media.Air,
+      useSolutionFlowInput=true,
+      SolutionFlow=DV*RR)
       annotation (Placement(transformation(extent={{-2,-30},{18,-10}})));
     Physiolibrary.Fluid.Sources.VolumeOutflowSource volumeOutflowSource(
       useSolutionFlowInput=true,
         SolutionFlow=TV*RR, redeclare package Medium = Physiolibrary.Media.Air)
       annotation (Placement(transformation(extent={{-10,-10},{10,10}},
           rotation=0,
-          origin={114,-20})));
+          origin={116,-20})));
     Physiolibrary.Fluid.Components.VolumePump srdceP(
       redeclare package Medium = Blood,
       useSolutionFlowInput=true,
@@ -77,7 +77,7 @@ package hack_ferkl_1
       volume_start(displayUnit="l") = 0.00085,
       Compliance(displayUnit="ml/mmHg") = 2.6627185942521e-08,
       ZeroPressureVolume(displayUnit="l") = 0.00045,
-      nPorts=4) annotation (Placement(transformation(extent={{66,-258},{86,-236}})));
+      nPorts=5) annotation (Placement(transformation(extent={{66,-258},{86,-236}})));
     Physiolibrary.Fluid.Components.ElasticVessel Veny(
       redeclare package Medium = Blood,
       volume_start(displayUnit="l") = 0.00325,
@@ -145,7 +145,7 @@ package hack_ferkl_1
         Placement(transformation(
           extent={{-10,-10},{10,10}},
           rotation=180,
-          origin={78,-320})));
+          origin={82,-314})));
     Chemical.Sources.SubstanceOutflow O2_left1(useSubstanceFlowInput=false,
         SubstanceFlow(displayUnit="mmol/min") = 0.00025666666666667) annotation (
         Placement(transformation(
@@ -156,13 +156,13 @@ package hack_ferkl_1
       redeclare package stateOfMatter = Chemical.Interfaces.IdealGas,
       substanceData=Chemical.Substances.Oxygen_gas(),
       redeclare package Medium = Physiolibrary.Media.BloodBySiggaardAndersen)
-      annotation (Placement(transformation(extent={{-72,-364},{-52,-344}})));
+      annotation (Placement(transformation(extent={{-70,-360},{-50,-340}})));
     Physiolibrary.Fluid.Sensors.PartialPressure pCO2_tissue(
       redeclare package stateOfMatter = Chemical.Interfaces.IdealGas,
       substanceData=Chemical.Substances.CarbonDioxide_gas(),
       redeclare package Medium = Physiolibrary.Media.BloodBySiggaardAndersen)
       annotation (Placement(transformation(
-          extent={{-10,-10},{10,10}},
+          extent={{10,-10},{-10,10}},
           rotation=0,
           origin={86,-362})));
     Physiolibrary.Fluid.Components.Conductor shunt(redeclare package Medium =
@@ -177,36 +177,93 @@ package hack_ferkl_1
       C_cirkulace=ones(NA)*(C_totalCirkulace/NA))
                                    annotation (Placement(transformation(rotation=0,
             extent={{-10,-74},{10,-54}})));
-    Physiolibrary.Types.Constants.HydraulicConductanceConst
-      hydraulicConductance2(k(displayUnit="ml/(kPa.min)") = 2.5e-07)
-      annotation (Placement(transformation(extent={{128,-210},{136,-202}})));
     Physiolibrary.Types.Constants.PressureConst pressure(k(displayUnit="kPa")
          = 4800)
-      annotation (Placement(transformation(extent={{134,-250},{142,-242}})));
+      annotation (Placement(transformation(extent={{148,-272},{156,-264}})));
     Modelica.Blocks.Math.Add add(k1=-1)
       annotation (Placement(transformation(extent={{176,-284},{196,-264}})));
     Modelica.Blocks.Math.Product product3 annotation (Placement(transformation(
-          extent={{-10,-10},{10,10}},
+          extent={{-10,10},{10,-10}},
           rotation=90,
-          origin={198,-212})));
-    Physiolibrary.Fluid.Sensors.PartialPressure partialPressure(
+          origin={208,-212})));
+    Physiolibrary.Fluid.Sensors.PartialPressure pCO2Arterie(
       redeclare package stateOfMatter = Chemical.Interfaces.IdealGas,
       substanceData=Chemical.Substances.CarbonDioxide_gas(),
       redeclare package Medium = Physiolibrary.Media.BloodBySiggaardAndersen)
       annotation (Placement(transformation(
           extent={{-10,-10},{10,10}},
           rotation=180,
-          origin={122,-276})));
-    Modelica.Blocks.Math.Gain gain(k=0.3) annotation (Placement(transformation(
+          origin={68,-284})));
+    Modelica.Blocks.Math.Max max1 annotation (Placement(transformation(
+          extent={{-10,10},{10,-10}},
+          rotation=90,
+          origin={184,-128})));
+    Modelica.Blocks.Sources.Constant const(k=0)
+      annotation (Placement(transformation(extent={{150,-178},{170,-158}})));
+    Physiolibrary.Types.Constants.VolumeConst volume(k(displayUnit="l") =
+        0.00035) annotation (Placement(transformation(
+          extent={{-4,-4},{4,4}},
+          rotation=180,
+          origin={110,40})));
+    Physiolibrary.Types.Constants.FrequencyConst frequency(k=
+          0.01666666666666667*(50/(2 - 0.35))) annotation (Placement(
+          transformation(
+          extent={{-4,-4},{4,4}},
+          rotation=180,
+          origin={168,30})));
+    Modelica.Blocks.Math.Division division annotation (Placement(transformation(
           extent={{-10,-10},{10,10}},
           rotation=180,
-          origin={130,28})));
+          origin={138,24})));
+    Modelica.Blocks.Math.Add TidalVolume annotation (Placement(transformation(
+          extent={{-10,-10},{10,10}},
+          rotation=180,
+          origin={80,34})));
+    Modelica.Blocks.Math.Product RespirationRate annotation (Placement(
+          transformation(
+          extent={{-10,-10},{10,10}},
+          rotation=180,
+          origin={42,40})));
+    Physiolibrary.Types.Constants.VolumeConst DeadSpaceVolume(k=DV)
+      annotation (Placement(transformation(extent={{-26,36},{-18,44}})));
+    Modelica.Blocks.Math.Product product5 annotation (Placement(transformation(
+          extent={{-10,-10},{10,10}},
+          rotation=270,
+          origin={10,16})));
+    Physiolibrary.Fluid.Sensors.PartialPressure pO2Arterie(
+      redeclare package stateOfMatter = Chemical.Interfaces.IdealGas,
+      substanceData=Chemical.Substances.CarbonDioxide_gas(),
+      redeclare package Medium = Physiolibrary.Media.BloodBySiggaardAndersen)
+      annotation (Placement(transformation(
+          extent={{-10,-10},{10,10}},
+          rotation=180,
+          origin={126,-300})));
+    Physiolibrary.Types.Constants.PressureConst CC(k(displayUnit="kPa") = 4300)
+      annotation (Placement(transformation(extent={{122,-330},{130,-322}})));
+    Modelica.Blocks.Math.Add scitani(k1=-1) annotation (Placement(
+          transformation(
+          extent={{10,-10},{-10,10}},
+          rotation=180,
+          origin={164,-310})));
+    Physiolibrary.Types.Constants.VolumeFlowRateConst volumeFlowRate(k(
+          displayUnit="l/min") = 0.0019247533333333)
+      annotation (Placement(transformation(extent={{216,-290},{224,-282}})));
+    Modelica.Blocks.Math.Division division1 annotation (Placement(
+          transformation(
+          extent={{-10,-10},{10,10}},
+          rotation=90,
+          origin={248,-264})));
+    Modelica.Blocks.Math.Min min1
+      annotation (Placement(transformation(extent={{192,-326},{212,-306}})));
+    Physiolibrary.Types.Constants.PressureConst pressure1(k(displayUnit="kPa")
+         = 700)
+      annotation (Placement(transformation(extent={{160,-340},{168,-332}})));
   equation
-    connect(volumePump.q_out,volumeOutflowSource. q_in) annotation (Line(
-        points={{18,-20},{104,-20}},
+    connect(DeadSpace.q_out, volumeOutflowSource.q_in) annotation (Line(
+        points={{18,-20},{106,-20}},
         color={127,0,0},
         thickness=0.5));
-    connect(pressureSource.y,volumePump. q_in) annotation (Line(
+    connect(pressureSource.y, DeadSpace.q_in) annotation (Line(
         points={{-118,-20},{-2,-20}},
         color={127,0,0},
         thickness=0.5));
@@ -227,7 +284,7 @@ package hack_ferkl_1
         color={127,0,0},
         thickness=0.5));
     connect(flowMeasure2.q_out, Arterie.q_in[1]) annotation (Line(
-        points={{56,-198},{50,-198},{50,-212},{75.9,-212},{75.9,-244.855}},
+        points={{56,-198},{50,-198},{50,-212},{75.9,-212},{75.9,-244.712}},
         color={127,0,0},
         thickness=0.5));
     connect(TlakPlicVeny.q_in,PlicVena. q_in[2]) annotation (Line(
@@ -236,7 +293,7 @@ package hack_ferkl_1
         color={127,0,0},
         thickness=0.5));
     connect(TlakArterie.q_in,Arterie. q_in[2]) annotation (Line(
-        points={{102,-244},{92,-244},{92,-248},{75.9,-248},{75.9,-246.285}},
+        points={{102,-244},{92,-244},{92,-248},{75.9,-248},{75.9,-245.856}},
         color={127,0,0},
         thickness=0.5));
     connect(TlakVeny.q_in,Veny. q_in[2]) annotation (Line(
@@ -270,7 +327,7 @@ package hack_ferkl_1
         color={127,0,0},
         thickness=0.5));
     connect(resistor1.q_in,Arterie. q_in[3]) annotation (Line(
-        points={{46,-250},{75.9,-250},{75.9,-247.715}},
+        points={{46,-250},{75.9,-250},{75.9,-247}},
         color={127,0,0},
         thickness=0.5));
     connect(elasticVessel.q_in[1],resistor2. q_in) annotation (Line(
@@ -282,16 +339,16 @@ package hack_ferkl_1
         color={127,0,0},
         thickness=0.5));
     connect(CO2_left1.port_b, elasticVessel.substances[3]) annotation (Line(
-          points={{68,-320},{50,-320},{50,-314},{10,-314},{10,-316}}, color={158,
+          points={{72,-314},{10,-314},{10,-316}},                     color={158,
             66,200}));
     connect(O2_left1.port_a, elasticVessel.substances[2]) annotation (Line(points={{-60,
             -308},{10,-308},{10,-316}},      color={158,66,200}));
-    connect(O2_left1.port_a, pO2_tissue.port_a) annotation (Line(points={{-60,-308},
-            {-38,-308},{-38,-354},{-52,-354}}, color={158,66,200}));
+    connect(O2_left1.port_a, pO2_tissue.port_a) annotation (Line(points={{-60,
+            -308},{-52,-308},{-52,-350},{-50,-350}},
+                                               color={158,66,200}));
     connect(pO2_tissue.referenceFluidPort, elasticVessel.q_in[3]) annotation (
         Line(
-        points={{-62,-363.8},{-50,-363.8},{-50,-358},{-2,-358},{-2,-294},{8,-294},
-            {8,-302},{10,-302},{10,-306.1}},
+        points={{-60,-359.8},{-60,-366},{10,-366},{10,-306.1}},
         color={127,0,0},
         thickness=0.5));
     connect(pCO2_tissue.referenceFluidPort, elasticVessel.q_in[4]) annotation (
@@ -299,8 +356,8 @@ package hack_ferkl_1
         points={{86,-371.8},{11.04,-371.8},{11.04,-306.1}},
         color={127,0,0},
         thickness=0.5));
-    connect(CO2_left1.port_b, pCO2_tissue.port_a) annotation (Line(points={{68,-320},
-            {50,-320},{50,-362},{96,-362}},  color={158,66,200}));
+    connect(CO2_left1.port_b, pCO2_tissue.port_a) annotation (Line(points={{72,-314},
+            {68,-314},{68,-362},{76,-362}},  color={158,66,200}));
     connect(resistor1.q_out, elasticVessel.q_in[5]) annotation (Line(
         points={{26,-250},{12.08,-250},{12.08,-306.1}},
         color={127,0,0},
@@ -317,7 +374,7 @@ package hack_ferkl_1
           for i in 1:NA loop
     connect(alveolarniJednotka[i].q_out,
                               volumeOutflowSource. q_in) annotation (Line(
-        points={{8,-54},{8,-44},{86,-44},{86,-20},{104,-20}},
+        points={{8,-54},{8,-44},{86,-44},{86,-20},{106,-20}},
         color={127,0,0},
         thickness=0.5));
     connect(pressureSource.y,alveolarniJednotka[i].q_in)
@@ -337,34 +394,67 @@ package hack_ferkl_1
         color={127,0,0},
         thickness=0.5));
           end for;
-    connect(partialPressure.port_a, Arterie.substances[2]) annotation (Line(
-          points={{112,-276},{56,-276},{56,-247},{66,-247}}, color={158,66,200}));
-    connect(partialPressure.partialPressure, add.u2) annotation (Line(points={{
-            132,-276},{150,-276},{150,-282},{174,-282},{174,-280}}, color={0,0,
-            127}));
-    connect(pressure.y, add.u1) annotation (Line(points={{143,-246},{174,-246},
-            {174,-268}}, color={0,0,127}));
-    connect(add.y, product3.u2) annotation (Line(points={{197,-274},{204,-274},
-            {204,-224}}, color={0,0,127}));
-    connect(hydraulicConductance2.y, product3.u1) annotation (Line(points={{137,
-            -206},{146,-206},{146,-208},{174,-208},{174,-238},{192,-238},{192,
-            -224}}, color={0,0,127}));
-    connect(product3.y, volumeOutflowSource.solutionFlow) annotation (Line(
-          points={{198,-201},{198,-32},{198,-13},{114,-13}}, color={0,0,127}));
-    connect(gain.u, volumeOutflowSource.solutionFlow) annotation (Line(points={
-            {142,28},{158,28},{158,32},{198,32},{198,-13},{114,-13}}, color={0,
-            0,127}));
-    connect(gain.y, volumePump.solutionFlow)
-      annotation (Line(points={{119,28},{8,28},{8,-13}}, color={0,0,127}));
-    connect(partialPressure.referenceFluidPort, Arterie.q_in[4]) annotation (
-        Line(
-        points={{122,-266.2},{114,-266.2},{114,-264},{75.9,-264},{75.9,-249.145}},
-
+    connect(pCO2Arterie.partialPressure, add.u2) annotation (Line(points={{78,
+            -284},{164,-284},{164,-280},{174,-280}}, color={0,0,127}));
+    connect(pressure.y, add.u1)
+      annotation (Line(points={{157,-268},{174,-268}}, color={0,0,127}));
+    connect(add.y, product3.u2) annotation (Line(points={{197,-274},{202,-274},
+            {202,-224}}, color={0,0,127}));
+    connect(pCO2Arterie.referenceFluidPort, Arterie.q_in[4]) annotation (Line(
+        points={{68,-274.2},{68,-270},{122,-270},{122,-226},{70,-226},{70,-246},
+            {75.9,-246},{75.9,-248.144}},
         color={127,0,0},
         thickness=0.5));
+    connect(pCO2Arterie.port_a, Arterie.substances[3]) annotation (Line(points=
+            {{58,-284},{56,-284},{56,-247},{66,-247}}, color={158,66,200}));
+    connect(const.y, max1.u2) annotation (Line(points={{171,-168},{178,-168},{
+            178,-140}}, color={0,0,127}));
+    connect(product3.y, max1.u1) annotation (Line(points={{208,-201},{208,-148},
+            {190,-148},{190,-140}}, color={0,0,127}));
+    connect(max1.y, volumeOutflowSource.solutionFlow) annotation (Line(points={
+            {184,-117},{184,-2},{116,-2},{116,-13}}, color={0,0,127}));
+    connect(frequency.y, division.u2) annotation (Line(points={{163,30},{162,30},
+            {162,40},{150,40},{150,30}}, color={0,0,127}));
+    connect(volume.y, TidalVolume.u2)
+      annotation (Line(points={{105,40},{92,40}}, color={0,0,127}));
+    connect(division.y, TidalVolume.u1)
+      annotation (Line(points={{127,24},{92,24},{92,28}}, color={0,0,127}));
+    connect(TidalVolume.y, RespirationRate.u1)
+      annotation (Line(points={{69,34},{54,34}}, color={0,0,127}));
+    connect(RespirationRate.y, product5.u1)
+      annotation (Line(points={{31,40},{16,40},{16,28}}, color={0,0,127}));
+    connect(DeadSpaceVolume.y, product5.u2)
+      annotation (Line(points={{-17,40},{4,40},{4,28}}, color={0,0,127}));
+    connect(product5.y, DeadSpace.solutionFlow) annotation (Line(points={{10,5},
+            {10,-4},{10,-13},{8,-13}}, color={0,0,127}));
+    connect(max1.y, division.u1) annotation (Line(points={{184,-117},{184,18},{
+            150,18}}, color={0,0,127}));
+    connect(RespirationRate.u2, division.u1) annotation (Line(points={{54,46},{
+            66,46},{66,54},{184,54},{184,18},{150,18}}, color={0,0,127}));
+    connect(pO2Arterie.port_a, Arterie.substances[2]) annotation (Line(points={
+            {116,-300},{114,-300},{114,-266},{66,-266},{66,-247}}, color={158,
+            66,200}));
+    connect(pO2Arterie.referenceFluidPort, Arterie.q_in[5]) annotation (Line(
+        points={{126,-290.2},{126,-282},{75.9,-282},{75.9,-249.288}},
+        color={127,0,0},
+        thickness=0.5));
+    connect(CC.y, scitani.u1) annotation (Line(points={{131,-326},{146,-326},{
+            146,-316},{152,-316}}, color={0,0,127}));
+    connect(pO2Arterie.partialPressure, scitani.u2) annotation (Line(points={{
+            136,-300},{142,-300},{142,-304},{152,-304}}, color={0,0,127}));
+    connect(division1.y, product3.u1) annotation (Line(points={{248,-253},{248,
+            -232},{214,-232},{214,-224}}, color={0,0,127}));
+    connect(scitani.y, min1.u1)
+      annotation (Line(points={{175,-310},{190,-310}}, color={0,0,127}));
+    connect(pressure1.y, min1.u2) annotation (Line(points={{169,-336},{182,-336},
+            {182,-322},{190,-322}}, color={0,0,127}));
+    connect(volumeFlowRate.y, division1.u1) annotation (Line(points={{225,-286},
+            {242,-286},{242,-276}}, color={0,0,127}));
+    connect(min1.y, division1.u2) annotation (Line(points={{213,-316},{254,-316},
+            {254,-276}}, color={0,0,127}));
     annotation (
-      Diagram(coordinateSystem(extent={{-200,-400},{240,200}})),
-      Icon(coordinateSystem(extent={{-200,-400},{240,200}})));
+      Diagram(coordinateSystem(extent={{-200,-400},{380,200}})),
+      Icon(coordinateSystem(extent={{-200,-400},{380,200}})));
   end spojeni;
 
   model AlveolarniJednotka
