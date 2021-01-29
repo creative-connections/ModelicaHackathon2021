@@ -1,0 +1,15 @@
+Blood gases transport model
+Mean respiration 
+total ventilation = (tidal volume - dead space) * respiration rate
+Mean non-pulsative circulation (from Gyuton 1972)
+
+Constant metabolic activity
+constant consumption of O2 in tissues
+constant production of CO2 in tissues
+
+
+Reference:
+- Ventilation rate to respiration rate and tidal volume from: https://pulse.kitware.com/_respiratory_methodology.html
+- Regulation of ventilation rate: Lumb, Andrew B., and Caroline R. Thomas. Nunn's applied respiratory physiology eBook. Elsevier Health Sciences, 2020. 
+- based on pCO2: page 59
+- based on pO2: page 64
