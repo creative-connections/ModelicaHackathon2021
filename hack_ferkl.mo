@@ -14,27 +14,29 @@ package hack_ferkl
       parameter Physiolibrary.Types.Volume DV=0.00015
                                                    "Dead space volume";
       //parameter Physiolibrary.Types.Fraction FlungShunt(start=0.02);
-      parameter Physiolibrary.Types.HydraulicConductance C_shunt=1.250102626409427e-07
-        *((0.02*(1/3)));
+      parameter Physiolibrary.Types.HydraulicConductance C_shunt=
+        1.250102626409427e-07*((0.02*(1/3)));
      // parameter Physiolibrary.Types.HydraulicConductance C_perf=1.250102626409427e-07
         //*((1 - 0.02)*(1/3));
       parameter Integer NA = 10 "pocet alveolarnich jednotek";
-      parameter Physiolibrary.Types.HydraulicConductance C_totalVentilace=1.250102626409427e-07
-        *((1/1.5));
-      parameter Physiolibrary.Types.HydraulicConductance C_totalCirkulace=1.250102626409427e-07
-        *(1/3*(1 - 0.02));
+      parameter Physiolibrary.Types.HydraulicConductance C_totalVentilace=
+        1.019716212977928e-05*((1/1.5));
+      parameter Physiolibrary.Types.HydraulicConductance C_totalCirkulace=
+        1.250102626409427e-07*(1/3*(1 - 0.02));
     Physiolibrary.Fluid.Sources.PressureSource pressureSource(redeclare package
         Medium = Physiolibrary.Media.Air)
-      annotation (Placement(transformation(extent={{-140,132},{-120,152}})));
-    Physiolibrary.Fluid.Components.VolumePump volumePump(redeclare package
-        Medium =
-          Physiolibrary.Media.Air, SolutionFlow=DV*RR)
-      annotation (Placement(transformation(extent={{-4,132},{16,152}})));
+      annotation (Placement(transformation(extent={{-138,-30},{-118,-10}})));
+    Physiolibrary.Fluid.Components.VolumePump DeadSpace(
+      redeclare package Medium = Physiolibrary.Media.Air,
+      useSolutionFlowInput=true,
+      SolutionFlow=DV*RR)
+      annotation (Placement(transformation(extent={{-2,-30},{18,-10}})));
     Physiolibrary.Fluid.Sources.VolumeOutflowSource volumeOutflowSource(
+      useSolutionFlowInput=true,
         SolutionFlow=TV*RR, redeclare package Medium = Physiolibrary.Media.Air)
       annotation (Placement(transformation(extent={{-10,-10},{10,10}},
           rotation=0,
-          origin={112,142})));
+          origin={116,-20})));
     Physiolibrary.Fluid.Components.VolumePump srdceP(
       redeclare package Medium = Blood,
       useSolutionFlowInput=true,
@@ -71,10 +73,11 @@ package hack_ferkl
       nPorts=3) annotation (Placement(transformation(extent={{48,-124},{68,-104}})));
     Physiolibrary.Fluid.Components.ElasticVessel Arterie(
       redeclare package Medium = Blood,
+      useSubstances=true,
       volume_start(displayUnit="l") = 0.00085,
       Compliance(displayUnit="ml/mmHg") = 2.6627185942521e-08,
       ZeroPressureVolume(displayUnit="l") = 0.00045,
-      nPorts=3) annotation (Placement(transformation(extent={{66,-258},{86,-236}})));
+      nPorts=4) annotation (Placement(transformation(extent={{66,-258},{86,-236}})));
     Physiolibrary.Fluid.Components.ElasticVessel Veny(
       redeclare package Medium = Blood,
       volume_start(displayUnit="l") = 0.00325,
@@ -173,14 +176,70 @@ package hack_ferkl
       C_ventilace=ones(NA)*(C_totalVentilace/NA),
       C_cirkulace=ones(NA)*(C_totalCirkulace/NA))
                                    annotation (Placement(transformation(rotation=0,
-            extent={{-12,88},{8,108}})));
+            extent={{-10,-74},{10,-54}})));
+    Physiolibrary.Types.Constants.HydraulicConductanceConst
+      hydraulicConductance2(k(displayUnit="ml/(kPa.min)") = 2.5e-07)
+      annotation (Placement(transformation(extent={{128,-210},{136,-202}})));
+    Physiolibrary.Types.Constants.PressureConst pressure(k(displayUnit="kPa")
+         = 4800)
+      annotation (Placement(transformation(extent={{134,-250},{142,-242}})));
+    Modelica.Blocks.Math.Add add(k1=-1)
+      annotation (Placement(transformation(extent={{176,-284},{196,-264}})));
+    Modelica.Blocks.Math.Product product3 annotation (Placement(transformation(
+          extent={{-10,-10},{10,10}},
+          rotation=90,
+          origin={198,-212})));
+    Physiolibrary.Fluid.Sensors.PartialPressure partialPressure(
+      redeclare package stateOfMatter = Chemical.Interfaces.IdealGas,
+      substanceData=Chemical.Substances.CarbonDioxide_gas(),
+      redeclare package Medium = Physiolibrary.Media.BloodBySiggaardAndersen)
+      annotation (Placement(transformation(
+          extent={{-10,-10},{10,10}},
+          rotation=180,
+          origin={122,-276})));
+    Modelica.Blocks.Math.Max max1 annotation (Placement(transformation(
+          extent={{-10,-10},{10,10}},
+          rotation=90,
+          origin={184,-128})));
+    Modelica.Blocks.Sources.Constant const(k=0)
+      annotation (Placement(transformation(extent={{92,-200},{112,-180}})));
+    Physiolibrary.Types.Constants.VolumeConst volume(k(displayUnit="l") =
+        0.00035) annotation (Placement(transformation(
+          extent={{-4,-4},{4,4}},
+          rotation=180,
+          origin={112,74})));
+    Physiolibrary.Types.Constants.FrequencyConst frequency(k=
+          0.01666666666666667*(50/(2 - 0.35))) annotation (Placement(
+          transformation(
+          extent={{-4,-4},{4,4}},
+          rotation=180,
+          origin={176,52})));
+    Modelica.Blocks.Math.Division division annotation (Placement(transformation(
+          extent={{-10,-10},{10,10}},
+          rotation=180,
+          origin={134,28})));
+    Modelica.Blocks.Math.Add TidalVolume annotation (Placement(transformation(
+          extent={{-10,-10},{10,10}},
+          rotation=180,
+          origin={80,34})));
+    Modelica.Blocks.Math.Product RespirationRate annotation (Placement(
+          transformation(
+          extent={{-10,-10},{10,10}},
+          rotation=180,
+          origin={38,48})));
+    Physiolibrary.Types.Constants.VolumeConst DeadSpaceVolume(k=DV)
+      annotation (Placement(transformation(extent={{-88,54},{-80,62}})));
+    Modelica.Blocks.Math.Product product5 annotation (Placement(transformation(
+          extent={{-10,-10},{10,10}},
+          rotation=270,
+          origin={10,16})));
   equation
-    connect(volumePump.q_out,volumeOutflowSource. q_in) annotation (Line(
-        points={{16,142},{102,142}},
+    connect(DeadSpace.q_out, volumeOutflowSource.q_in) annotation (Line(
+        points={{18,-20},{106,-20}},
         color={127,0,0},
         thickness=0.5));
-    connect(pressureSource.y,volumePump. q_in) annotation (Line(
-        points={{-120,142},{-4,142}},
+    connect(pressureSource.y, DeadSpace.q_in) annotation (Line(
+        points={{-118,-20},{-2,-20}},
         color={127,0,0},
         thickness=0.5));
     connect(srdceP.q_out,PlicArterie. q_in[1]) annotation (Line(
@@ -200,7 +259,7 @@ package hack_ferkl
         color={127,0,0},
         thickness=0.5));
     connect(flowMeasure2.q_out, Arterie.q_in[1]) annotation (Line(
-        points={{56,-198},{50,-198},{50,-212},{75.9,-212},{75.9,-245.093}},
+        points={{56,-198},{50,-198},{50,-212},{75.9,-212},{75.9,-244.855}},
         color={127,0,0},
         thickness=0.5));
     connect(TlakPlicVeny.q_in,PlicVena. q_in[2]) annotation (Line(
@@ -209,7 +268,7 @@ package hack_ferkl
         color={127,0,0},
         thickness=0.5));
     connect(TlakArterie.q_in,Arterie. q_in[2]) annotation (Line(
-        points={{102,-244},{92,-244},{92,-248},{75.9,-248},{75.9,-247}},
+        points={{102,-244},{92,-244},{92,-248},{75.9,-248},{75.9,-246.285}},
         color={127,0,0},
         thickness=0.5));
     connect(TlakVeny.q_in,Veny. q_in[2]) annotation (Line(
@@ -243,7 +302,7 @@ package hack_ferkl
         color={127,0,0},
         thickness=0.5));
     connect(resistor1.q_in,Arterie. q_in[3]) annotation (Line(
-        points={{46,-250},{75.9,-250},{75.9,-248.907}},
+        points={{46,-250},{75.9,-250},{75.9,-247.715}},
         color={127,0,0},
         thickness=0.5));
     connect(elasticVessel.q_in[1],resistor2. q_in) annotation (Line(
@@ -290,25 +349,69 @@ package hack_ferkl
           for i in 1:NA loop
     connect(alveolarniJednotka[i].q_out,
                               volumeOutflowSource. q_in) annotation (Line(
-        points={{6,108},{6,118},{84,118},{84,142},{102,142}},
+        points={{8,-54},{8,-44},{86,-44},{86,-20},{106,-20}},
         color={127,0,0},
         thickness=0.5));
     connect(pressureSource.y,alveolarniJednotka[i].q_in)
                                               annotation (Line(
-        points={{-120,142},{-52,142},{-52,106},{-12,106}},
+        points={{-118,-20},{-50,-20},{-50,-56},{-10,-56}},
         color={127,0,0},
         thickness=0.5));
     connect(alveolarniJednotka[i].q_out1,
                             PlicVena. q_in[3]) annotation (Line(
-        points={{4,88},{4,-115.733},{57.9,-115.733}},
+        points={{6,-74},{6,-115.733},{57.9,-115.733}},
         color={127,0,0},
         thickness=0.5));
     connect(alveolarniJednotka[i].q_in1,
                           PlicArterie. q_in[3]) annotation (Line(
-        points={{-8,88},{-8,-86},{-108,-86},{-108,-105.733},{-70.1,-105.733}},
+        points={{-6,-74},{-6,-88},{-86,-88},{-86,-120},{-62,-120},{-62,-105.733},
+              {-70.1,-105.733}},
         color={127,0,0},
         thickness=0.5));
           end for;
+    connect(partialPressure.partialPressure, add.u2) annotation (Line(points={{
+            132,-276},{150,-276},{150,-282},{174,-282},{174,-280}}, color={0,0,
+            127}));
+    connect(pressure.y, add.u1) annotation (Line(points={{143,-246},{174,-246},
+            {174,-268}}, color={0,0,127}));
+    connect(add.y, product3.u2) annotation (Line(points={{197,-274},{204,-274},
+            {204,-224}}, color={0,0,127}));
+    connect(hydraulicConductance2.y, product3.u1) annotation (Line(points={{137,
+            -206},{146,-206},{146,-208},{174,-208},{174,-238},{192,-238},{192,
+            -224}}, color={0,0,127}));
+    connect(partialPressure.referenceFluidPort, Arterie.q_in[4]) annotation (
+        Line(
+        points={{122,-266.2},{114,-266.2},{114,-264},{75.9,-264},{75.9,-249.145}},
+
+        color={127,0,0},
+        thickness=0.5));
+    connect(partialPressure.port_a, Arterie.substances[3]) annotation (Line(
+          points={{112,-276},{96,-276},{96,-272},{66,-272},{66,-247}}, color={
+            158,66,200}));
+    connect(const.y, max1.u2) annotation (Line(points={{113,-190},{142,-190},{
+            142,-150},{190,-150},{190,-140}}, color={0,0,127}));
+    connect(product3.y, max1.u1) annotation (Line(points={{198,-201},{198,-148},
+            {178,-148},{178,-140}}, color={0,0,127}));
+    connect(max1.y, volumeOutflowSource.solutionFlow) annotation (Line(points={
+            {184,-117},{184,-2},{116,-2},{116,-13}}, color={0,0,127}));
+    connect(frequency.y, division.u2) annotation (Line(points={{171,52},{156,52},
+            {156,34},{146,34}}, color={0,0,127}));
+    connect(volume.y, TidalVolume.u2) annotation (Line(points={{107,74},{98,74},
+            {98,48},{100,48},{100,40},{92,40}}, color={0,0,127}));
+    connect(division.y, TidalVolume.u1) annotation (Line(points={{123,28},{116,
+            28},{116,24},{92,24},{92,28}}, color={0,0,127}));
+    connect(RespirationRate.u2, division.u1) annotation (Line(points={{50,54},{
+            50,112},{218,112},{218,22},{146,22}}, color={0,0,127}));
+    connect(TidalVolume.y, RespirationRate.u1)
+      annotation (Line(points={{69,34},{50,34},{50,42}}, color={0,0,127}));
+    connect(RespirationRate.y, product5.u1) annotation (Line(points={{27,48},{
+            20,48},{20,36},{16,36},{16,28}}, color={0,0,127}));
+    connect(DeadSpaceVolume.y, product5.u2) annotation (Line(points={{-79,58},{
+            -46,58},{-46,52},{4,52},{4,28}}, color={0,0,127}));
+    connect(product5.y, DeadSpace.solutionFlow) annotation (Line(points={{10,5},
+            {10,-4},{10,-13},{8,-13}}, color={0,0,127}));
+    connect(max1.y, division.u1) annotation (Line(points={{184,-117},{184,22},{
+            146,22}}, color={0,0,127}));
     annotation (
       Diagram(coordinateSystem(extent={{-200,-400},{240,200}})),
       Icon(coordinateSystem(extent={{-200,-400},{240,200}})));
@@ -337,8 +440,8 @@ package hack_ferkl
         Medium =
           Physiolibrary.Media.Air)
       annotation (Placement(transformation(extent={{-46,100},{-26,120}})));
-    Physiolibrary.Fluid.Components.Conductor conductor(redeclare package Medium
-        = Physiolibrary.Media.Air, Conductance(displayUnit="l/(cmH2O.s)")=
+    Physiolibrary.Fluid.Components.Conductor conductor(redeclare package Medium =
+          Physiolibrary.Media.Air, Conductance(displayUnit="l/(cmH2O.s)")=
         C_ventilace)
                   annotation (Placement(transformation(
           extent={{-10,-10},{10,10}},
@@ -362,12 +465,12 @@ package hack_ferkl
           rotation=0,
           origin={70,38})));
     Physiolibrary.Fluid.Components.Conductor conductor1(
-                                                     redeclare package Medium
-        = Blood, Conductance=C_cirkulace*(8/7))
+                                                     redeclare package Medium =
+          Blood, Conductance=C_cirkulace*(8/7))
       annotation (Placement(transformation(extent={{-24,-98},{-4,-78}})));
     Physiolibrary.Fluid.Components.Conductor conductor2(
-                                                      redeclare package Medium
-        = Blood, Conductance=C_cirkulace*8)
+                                                      redeclare package Medium =
+          Blood, Conductance=C_cirkulace*8)
       annotation (Placement(transformation(extent={{26,-96},{46,-76}})));
     Physiolibrary.Fluid.Components.ElasticVessel elasticVessel1(
       redeclare package Medium = Physiolibrary.Media.BloodBySiggaardAndersen,
@@ -386,24 +489,24 @@ package hack_ferkl
           Physiolibrary.Media.BloodBySiggaardAndersen annotation(choicesAllMatching=True);
       //parameter Physiolibrary.Types.HydraulicConductance C_perf=1.250102626409427e-07
        // *((1 - 0.02)*(1/3));
-      parameter Physiolibrary.Types.HydraulicConductance C_ventilace=
-        1.250102626409427e-07*(1/1.5);
+      parameter Physiolibrary.Types.HydraulicConductance C_ventilace(
+        displayUnit="l/(cmH2O.s)")=1.019716212977928e-05*((1/1.5));
       parameter Physiolibrary.Types.HydraulicConductance C_cirkulace=
         1.250102626409427e-07*(1/3);
     Physiolibrary.Fluid.Interfaces.FluidPort_a q_in(redeclare package Medium =
           Physiolibrary.Media.Air) annotation (Placement(transformation(rotation=0,
             extent={{-112.5,95.5},{-87.5,118.5}})));
-    Physiolibrary.Fluid.Interfaces.FluidPort_b q_out(redeclare package Medium
-        = Physiolibrary.Media.Air) annotation (Placement(transformation(rotation=0,
+    Physiolibrary.Fluid.Interfaces.FluidPort_b q_out(redeclare package Medium =
+          Physiolibrary.Media.Air) annotation (Placement(transformation(rotation=0,
             extent={{112.5,118.5},{137.5,141.5}})));
-    Physiolibrary.Fluid.Interfaces.FluidPort_a q_in1(redeclare package Medium
-        = Blood) annotation (Placement(transformation(rotation=0, extent={{-62.5,-111.5},
+    Physiolibrary.Fluid.Interfaces.FluidPort_a q_in1(redeclare package Medium =
+          Blood) annotation (Placement(transformation(rotation=0, extent={{-62.5,-111.5},
               {-37.5,-88.5}})));
-    Physiolibrary.Fluid.Interfaces.FluidPort_b q_out1(redeclare package Medium
-        = Blood) annotation (Placement(transformation(rotation=0, extent={{87.5,-111.5},
+    Physiolibrary.Fluid.Interfaces.FluidPort_b q_out1(redeclare package Medium =
+          Blood) annotation (Placement(transformation(rotation=0, extent={{87.5,-111.5},
               {112.5,-88.5}})));
-    Physiolibrary.Fluid.Components.Resistor resistor1(redeclare package Medium
-        = Physiolibrary.Media.Air, Resistance=1/C_ventilace)
+    Physiolibrary.Fluid.Components.Resistor resistor1(redeclare package Medium =
+          Physiolibrary.Media.Air, Resistance=1/C_ventilace)
       annotation (Placement(transformation(extent={{84,100},{104,120}})));
   equation
     connect(TlakAlveoly.q_in,Alveoly. q_in[1]) annotation (Line(
