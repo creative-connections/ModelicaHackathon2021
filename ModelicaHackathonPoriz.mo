@@ -124,7 +124,7 @@ package ModelicaHackathonPoriz
         redeclare package Medium = CurrentlyChosenMedium)
       annotation (Placement(transformation(extent={{-38,-98},{-18,-78}})));
     Physiolibrary.Fluid.Sources.PressureSource inspiredAir(redeclare package
-        Medium = Physiolibrary.Media.Air)
+        Medium = Physiolibrary.Media.Air, P(displayUnit="bar"))
       annotation (Placement(transformation(extent={{-138,226},{-118,246}})));
     Physiolibrary.Fluid.Components.VolumePump deadspace(redeclare package
         Medium =
@@ -184,7 +184,7 @@ package ModelicaHackathonPoriz
           transformation(
           extent={{-4,-4},{4,4}},
           rotation=90,
-          origin={128,188})));
+          origin={94,126})));
     Modelica.Blocks.Math.Product product3 annotation (Placement(transformation(
           extent={{-10,-10},{10,10}},
           rotation=90,
@@ -235,31 +235,23 @@ package ModelicaHackathonPoriz
       substanceData=Chemical.Substances.Oxygen_gas(),
       redeclare package Medium = Physiolibrary.Media.BloodBySiggaardAndersen)
       annotation (Placement(transformation(extent={{88,-98},{68,-118}})));
-    Modelica.Blocks.Math.Division respirationRate1
-                                                  annotation (Placement(
-          transformation(
+    Modelica.Blocks.Math.Division slope annotation (Placement(transformation(
           extent={{-6,-6},{6,6}},
           rotation=90,
-          origin={180,184})));
-    Modelica.Blocks.Sources.Constant const1(k=1e-3*60*90*((101.325/760) - 4.3))
-      annotation (Placement(transformation(
-          extent={{-6,-6},{6,6}},
-          rotation=90,
-          origin={168,164})));
-    Modelica.Blocks.Math.Min tidalVolume1
-                                         annotation (Placement(transformation(
+          origin={132,174})));
+    Modelica.Blocks.Math.Min minpO2Delta annotation (Placement(transformation(
           extent={{-5,-5},{5,5}},
           rotation=90,
-          origin={191,165})));
+          origin={135,145})));
     Modelica.Blocks.Math.Add add2(k2=-1) annotation (Placement(transformation(
           extent={{-6,-6},{6,6}},
           rotation=90,
-          origin={174,138})));
+          origin={122,116})));
     Modelica.Blocks.Sources.Constant const2(k=5000 - 4300) annotation (
         Placement(transformation(
           extent={{-5,-5},{5,5}},
           rotation=90,
-          origin={193,137})));
+          origin={139,111})));
     Modelica.Blocks.Math.Product product4 annotation (Placement(transformation(
           extent={{-6,-6},{6,6}},
           rotation=90,
@@ -268,7 +260,17 @@ package ModelicaHackathonPoriz
           transformation(
           extent={{-6,-6},{6,6}},
           rotation=90,
-          origin={178,108})));
+          origin={126,86})));
+    Modelica.Blocks.Math.Gain W(k=1e-3*60*(90*(101325/760) - 4.3*1000))
+      annotation (Placement(transformation(
+          extent={{-5,-5},{5,5}},
+          rotation=90,
+          origin={103,143})));
+    Physiolibrary.Types.Constants.FrequencyConst m(k=0.505) annotation (
+        Placement(transformation(
+          extent={{-4,-4},{4,4}},
+          rotation=180,
+          origin={200,172})));
   equation
     connect(left_heart.q_in, pulmonary_veins.q_in[1]) annotation (Line(
         points={{18,-26},{18,35.95},{15.9,35.95}},
@@ -412,9 +414,6 @@ package ModelicaHackathonPoriz
     connect(pressure.y, add.u2) annotation (Line(points={{106,169},{116,169},{
             116,180.6},{107.2,180.6}},
                            color={0,0,127}));
-    connect(hydraulicConductance2.y, product3.u2) annotation (Line(points={{128,193},
-            {128,198},{116,198},{116,202}},
-                                          color={0,0,127}));
     connect(add.y, product3.u1) annotation (Line(points={{103,196.7},{90,196.7},
             {90,202},{104,202}},
                             color={0,0,127}));
@@ -455,26 +454,30 @@ package ModelicaHackathonPoriz
     connect(pO2_arterial_pressure.port_a, arteries.substances[2]) annotation (
         Line(points={{68,-108},{58,-108},{58,-112},{32,-112},{32,-104},{28,-104}},
           color={158,66,200}));
-    connect(const1.y, respirationRate1.u1) annotation (Line(points={{168,170.6},
-            {152,170.6},{152,176.8},{176.4,176.8}}, color={0,0,127}));
-    connect(const2.y, tidalVolume1.u2)
-      annotation (Line(points={{193,142.5},{194,159}}, color={0,0,127}));
-    connect(add2.y, tidalVolume1.u1) annotation (Line(points={{174,144.6},{174,
-            148},{188,148},{188,159}}, color={0,0,127}));
-    connect(tidalVolume1.y, respirationRate1.u2) annotation (Line(points={{191,
-            170.5},{191,176.8},{183.6,176.8}}, color={0,0,127}));
-    connect(respirationRate1.y, product4.u2) annotation (Line(points={{180,
-            190.6},{180,196.8},{169.6,196.8}}, color={0,0,127}));
+    connect(const2.y, minpO2Delta.u2) annotation (Line(points={{139,116.5},{136,
+            116.5},{136,132},{138,132},{138,139}}, color={0,0,127}));
+    connect(add2.y, minpO2Delta.u1) annotation (Line(points={{122,122.6},{132,
+            122.6},{132,139}}, color={0,0,127}));
+    connect(minpO2Delta.y, slope.u2) annotation (Line(points={{135,150.5},{136,
+            150.5},{136,166.8},{135.6,166.8}}, color={0,0,127}));
     connect(product4.u1, ventilation.y) annotation (Line(points={{162.4,196.8},
             {162.4,196},{162,196},{162,190},{152,190},{152,264},{98,264},{98,
             256},{95,256},{95,250.7}}, color={0,0,127}));
-    connect(const3.y, add2.u2) annotation (Line(points={{178,114.6},{182,114.6},
-            {182,118},{178,118},{178,130.8},{177.6,130.8}}, color={0,0,127}));
+    connect(const3.y, add2.u2) annotation (Line(points={{126,92.6},{130,92.6},{
+            130,96},{126,96},{126,108.8},{125.6,108.8}},    color={0,0,127}));
     connect(pO2_arterial_pressure.partialPressure, add2.u1) annotation (Line(
-          points={{88,-108},{158,-108},{158,130.8},{170.4,130.8}}, color={0,0,
+          points={{88,-108},{106,-108},{106,108.8},{118.4,108.8}}, color={0,0,
             127}));
     connect(product4.y, add1.u1) annotation (Line(points={{166,210.6},{166,
             232.8},{178.4,232.8}}, color={0,0,127}));
+    connect(slope.y, product3.u2) annotation (Line(points={{132,180.6},{132,192},
+            {116,192},{116,202}}, color={0,0,127}));
+    connect(hydraulicConductance2.y, W.u)
+      annotation (Line(points={{94,131},{94,137},{103,137}}, color={0,0,127}));
+    connect(W.y, slope.u1) annotation (Line(points={{103,148.5},{103,156},{
+            128.4,156},{128.4,166.8}}, color={0,0,127}));
+    connect(m.y, product4.u2) annotation (Line(points={{195,172},{178,172},{178,
+            178},{169.6,178},{169.6,196.8}}, color={0,0,127}));
     annotation (Diagram(coordinateSystem(extent={{-240,-200},{300,360}}),
           graphics={
           Rectangle(
@@ -502,7 +505,7 @@ package ModelicaHackathonPoriz
             textColor={0,0,0},
             textString="Cellular exchange"),
           Rectangle(
-            extent={{140,260},{82,156}},
+            extent={{140,260},{82,96}},
             lineColor={28,108,200},
             lineThickness=0.5),
           Rectangle(
@@ -510,7 +513,7 @@ package ModelicaHackathonPoriz
             lineColor={28,108,200},
             lineThickness=0.5),
           Text(
-            extent={{188,188},{216,180}},
+            extent={{136,166},{164,158}},
             textColor={28,108,200},
             textString="Calculation of slope")}),                          Icon(
           coordinateSystem(extent={{-240,-200},{300,360}})),
@@ -752,8 +755,7 @@ package ModelicaHackathonPoriz
           rotation=90,
           origin={2,168})));
     Physiolibrary.Fluid.Sensors.PressureMeasure pressureMeasure(redeclare
-        package                                                                   Medium =
-                         Physiolibrary.Media.Air)
+        package Medium = Physiolibrary.Media.Air)
       annotation (Placement(transformation(extent={{-4,190},{16,210}})));
     Chemical.Components.GasSolubility gasSolubilityO2(KC=1e-4)
       annotation (Placement(transformation(extent={{-24,128},{-4,148}})));
@@ -774,12 +776,10 @@ package ModelicaHackathonPoriz
           rotation=180,
           origin={76,142})));
     Physiolibrary.Fluid.Components.Resistor pulmonary_resistance1(redeclare
-        package                                                                     Medium =
-                         CurrentlyChosenMedium, Resistance=(1/C_circulation)*(7/8))
+        package Medium = CurrentlyChosenMedium, Resistance=(1/C_circulation)*(7/8))
       annotation (Placement(transformation(extent={{-32,50},{-12,70}})));
     Physiolibrary.Fluid.Components.Resistor pulmonary_resistance2(redeclare
-        package                                                                     Medium =
-                         CurrentlyChosenMedium, Resistance=(1/C_circulation)*(1/8))
+        package Medium = CurrentlyChosenMedium, Resistance=(1/C_circulation)*(1/8))
       annotation (Placement(transformation(extent={{10,50},{30,70}})));
     replaceable package CurrentlyChosenMedium =
         Physiolibrary.Media.BloodBySiggaardAndersen constrainedby
@@ -787,29 +787,29 @@ package ModelicaHackathonPoriz
       parameter Physiolibrary.Types.HydraulicConductance C_ventilation(displayUnit="l/(cmH2O.s)")=1.019716212977928e-05*(1/1.5);
       parameter Physiolibrary.Types.HydraulicConductance C_circulation=1.250102626409427e-10*(1/3*(1 - 0.02));
 
-    Physiolibrary.Fluid.Interfaces.FluidPort_b q_out(redeclare package Medium =
-          Physiolibrary.Media.Air) annotation (Placement(transformation(
+    Physiolibrary.Fluid.Interfaces.FluidPort_b q_out(redeclare package Medium
+        = Physiolibrary.Media.Air) annotation (Placement(transformation(
             rotation=0, extent={{50,230},{70,250}})));
     Physiolibrary.Fluid.Interfaces.FluidPort_a q_in(redeclare package Medium =
           CurrentlyChosenMedium) annotation (Placement(transformation(rotation=
               0, extent={{-50,30},{-30,50}})));
-    Physiolibrary.Fluid.Interfaces.FluidPort_b q_out1(redeclare package Medium =
-          CurrentlyChosenMedium) annotation (Placement(transformation(rotation=
+    Physiolibrary.Fluid.Interfaces.FluidPort_b q_out1(redeclare package Medium
+        = CurrentlyChosenMedium) annotation (Placement(transformation(rotation=
               0, extent={{30,30},{50,50}})));
-    Physiolibrary.Fluid.Interfaces.FluidPort_a q_in2(redeclare package Medium =
-          Physiolibrary.Media.Air) annotation (Placement(transformation(
+    Physiolibrary.Fluid.Interfaces.FluidPort_a q_in2(redeclare package Medium
+        = Physiolibrary.Media.Air) annotation (Placement(transformation(
             rotation=0, extent={{-90,230},{-70,250}})));
-    Physiolibrary.Fluid.Sensors.FlowMeasure flowMeasure1(redeclare package Medium =
-                 Physiolibrary.Media.Air)
+    Physiolibrary.Fluid.Sensors.FlowMeasure flowMeasure1(redeclare package
+        Medium = Physiolibrary.Media.Air)
       annotation (Placement(transformation(extent={{30,158},{50,178}})));
-    Physiolibrary.Fluid.Components.Resistor resistor(redeclare package Medium =
-          Physiolibrary.Media.Air,                                                                       Resistance=1/C_ventilation)
+    Physiolibrary.Fluid.Components.Resistor resistor(redeclare package Medium
+        = Physiolibrary.Media.Air,                                                                       Resistance=1/C_ventilation)
       annotation (Placement(transformation(
           extent={{-10,-10},{10,10}},
           rotation=-90,
           origin={-80,212})));
-    Physiolibrary.Fluid.Components.Resistor resistor1(redeclare package Medium =
-          Physiolibrary.Media.Air,                                                                        Resistance=1/C_ventilation)
+    Physiolibrary.Fluid.Components.Resistor resistor1(redeclare package Medium
+        = Physiolibrary.Media.Air,                                                                        Resistance=1/C_ventilation)
       annotation (Placement(transformation(
           extent={{-10,-10},{10,10}},
           rotation=-90,
