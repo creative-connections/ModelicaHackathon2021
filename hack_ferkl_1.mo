@@ -232,7 +232,7 @@ package hack_ferkl_1
           origin={10,16})));
     Physiolibrary.Fluid.Sensors.PartialPressure pO2Arterie(
       redeclare package stateOfMatter = Chemical.Interfaces.IdealGas,
-      substanceData=Chemical.Substances.CarbonDioxide_gas(),
+      substanceData=Chemical.Substances.Oxygen_gas(),
       redeclare package Medium = Physiolibrary.Media.BloodBySiggaardAndersen)
       annotation (Placement(transformation(
           extent={{-10,-10},{10,10}},
@@ -248,8 +248,7 @@ package hack_ferkl_1
     Physiolibrary.Types.Constants.VolumeFlowRateConst volumeFlowRate(k(
           displayUnit="l/min") = 0.0019247533333333)
       annotation (Placement(transformation(extent={{216,-290},{224,-282}})));
-    Modelica.Blocks.Math.Division division1 annotation (Placement(
-          transformation(
+    Modelica.Blocks.Math.Division Slope annotation (Placement(transformation(
           extent={{-10,-10},{10,10}},
           rotation=90,
           origin={248,-264})));
@@ -442,16 +441,16 @@ package hack_ferkl_1
             146,-316},{152,-316}}, color={0,0,127}));
     connect(pO2Arterie.partialPressure, scitani.u2) annotation (Line(points={{
             136,-300},{142,-300},{142,-304},{152,-304}}, color={0,0,127}));
-    connect(division1.y, product3.u1) annotation (Line(points={{248,-253},{248,
-            -232},{214,-232},{214,-224}}, color={0,0,127}));
+    connect(Slope.y, product3.u1) annotation (Line(points={{248,-253},{248,-232},
+            {214,-232},{214,-224}}, color={0,0,127}));
     connect(scitani.y, min1.u1)
       annotation (Line(points={{175,-310},{190,-310}}, color={0,0,127}));
     connect(pressure1.y, min1.u2) annotation (Line(points={{169,-336},{182,-336},
             {182,-322},{190,-322}}, color={0,0,127}));
-    connect(volumeFlowRate.y, division1.u1) annotation (Line(points={{225,-286},
-            {242,-286},{242,-276}}, color={0,0,127}));
-    connect(min1.y, division1.u2) annotation (Line(points={{213,-316},{254,-316},
-            {254,-276}}, color={0,0,127}));
+    connect(volumeFlowRate.y, Slope.u1) annotation (Line(points={{225,-286},{
+            242,-286},{242,-276}}, color={0,0,127}));
+    connect(min1.y, Slope.u2) annotation (Line(points={{213,-316},{254,-316},{
+            254,-276}}, color={0,0,127}));
     annotation (
       Diagram(coordinateSystem(extent={{-200,-400},{380,200}})),
       Icon(coordinateSystem(extent={{-200,-400},{380,200}})));
