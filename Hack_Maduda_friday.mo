@@ -274,35 +274,8 @@ package Hack_Maduda_friday
       C_circulation=ones(NA)*(c_TotalPerfusion/NA))
                                           annotation (Placement(transformation(
             rotation=0, extent={{-18,22},{2,42}})));
-    Physiolibrary.Types.Constants.PressureConst pressure(k(displayUnit="kPa")
-         = 4800) annotation (Placement(transformation(
-          extent={{-4,-4},{4,4}},
-          rotation=90,
-          origin={182,-66})));
-    Modelica.Blocks.Math.Add add(k2=-1) annotation (Placement(transformation(
-          extent={{-10,-10},{10,10}},
-          rotation=90,
-          origin={176,-26})));
-    Physiolibrary.Types.Constants.HydraulicConductanceConst
-      hydraulicConductance(k(displayUnit="ml/(kPa.min)") = 2.5e-07) annotation
-      (Placement(transformation(
-          extent={{-4,-4},{4,4}},
-          rotation=90,
-          origin={208,-14})));
-    Modelica.Blocks.Math.Product product1 annotation (Placement(transformation(
-          extent={{-10,-10},{10,10}},
-          rotation=90,
-          origin={182,24})));
-    Modelica.Blocks.Math.Gain gain(k=0.3) annotation (Placement(transformation(
-          extent={{-10,-10},{10,10}},
-          rotation=90,
-          origin={184,68})));
-    Modelica.Blocks.Math.Max max1 annotation (Placement(transformation(
-          extent={{-10,-10},{10,10}},
-          rotation=180,
-          origin={118,46})));
-    Modelica.Blocks.Sources.Constant const(k=0)
-      annotation (Placement(transformation(extent={{110,-8},{130,12}})));
+    VentRegulation ventRegulation annotation (Placement(transformation(rotation
+            =0, extent={{158,-6},{178,14}})));
   equation
 
     connect(VentilationFlow.q_in, DeadSpace.q_out) annotation (Line(
@@ -377,24 +350,14 @@ package Hack_Maduda_friday
         color={127,0,0},
         thickness=0.5));
     end for;
-    connect(circulation2_1.PartialPressureCO2_arteries, add.u1) annotation (
-        Line(points={{10.576,-50.2},{170,-50.2},{170,-38}}, color={0,0,127}));
-    connect(pressure.y, add.u2)
-      annotation (Line(points={{182,-61},{182,-38}}, color={0,0,127}));
-    connect(add.y, product1.u1)
-      annotation (Line(points={{176,-15},{176,12}}, color={0,0,127}));
-    connect(hydraulicConductance.y, product1.u2) annotation (Line(points={{208,
-            -9},{208,4},{188,4},{188,12}}, color={0,0,127}));
-    connect(product1.y, gain.u)
-      annotation (Line(points={{182,35},{184,35},{184,56}}, color={0,0,127}));
-    connect(gain.y, DeadSpace.solutionFlow)
-      annotation (Line(points={{184,79},{184,93},{-8,93}}, color={0,0,127}));
-    connect(product1.y, max1.u2)
-      annotation (Line(points={{182,35},{182,52},{130,52}}, color={0,0,127}));
-    connect(const.y, max1.u1) annotation (Line(points={{131,2},{144,2},{144,40},
-            {130,40}}, color={0,0,127}));
-    connect(max1.y, VentilationFlow.solutionFlow) annotation (Line(points={{107,
-            46},{100,46},{100,50},{98,50},{98,67},{80,67}}, color={0,0,127}));
+    connect(circulation2_1.PartialPressureCO2_arteries, ventRegulation.paCO2)
+      annotation (Line(points={{10.576,-50.2},{170,-50.2},{170,-6},{169.667,-6}},
+          color={0,0,127}));
+    connect(ventRegulation.DeadSpaceOutput, DeadSpace.solutionFlow) annotation
+      (Line(points={{172,14.75},{172,93},{-8,93}}, color={0,0,127}));
+    connect(ventRegulation.VentilationOutput, VentilationFlow.solutionFlow)
+      annotation (Line(points={{157,4},{110,4},{110,67},{80,67}}, color={0,0,
+            127}));
     annotation (Icon(coordinateSystem(preserveAspectRatio=false, extent={{-280,
               -200},{240,100}})),
                             Diagram(coordinateSystem(preserveAspectRatio=false,
@@ -1184,6 +1147,76 @@ package Hack_Maduda_friday
     annotation (Diagram(coordinateSystem(extent={{-100,-110},{100,90}})), Icon(
           coordinateSystem(extent={{-100,-110},{100,90}})));
   end AlveolarUnit;
+
+  model VentRegulation
+    Physiolibrary.Types.Constants.PressureConst pressure(k(displayUnit="kPa")
+         = 4800) annotation (Placement(transformation(
+          extent={{-4,-4},{4,4}},
+          rotation=90,
+          origin={22,-66})));
+    Modelica.Blocks.Math.Add add(k2=-1) annotation (Placement(transformation(
+          extent={{-10,-10},{10,10}},
+          rotation=90,
+          origin={16,-40})));
+    Physiolibrary.Types.Constants.HydraulicConductanceConst
+      hydraulicConductance(k(displayUnit="ml/(kPa.min)") = 2.5e-07) annotation
+      (Placement(transformation(
+          extent={{-4,-4},{4,4}},
+          rotation=90,
+          origin={48,-28})));
+    Modelica.Blocks.Math.Product product1 annotation (Placement(transformation(
+          extent={{-10,-10},{10,10}},
+          rotation=90,
+          origin={22,10})));
+    Modelica.Blocks.Math.Gain gain(k=0.3) annotation (Placement(transformation(
+          extent={{-10,-10},{10,10}},
+          rotation=90,
+          origin={24,54})));
+    Modelica.Blocks.Math.Max max1 annotation (Placement(transformation(
+          extent={{-10,-10},{10,10}},
+          rotation=180,
+          origin={-42,46})));
+    Modelica.Blocks.Sources.Constant const(k=0)
+      annotation (Placement(transformation(extent={{-46,-16},{-26,4}})));
+    Modelica.Blocks.Interfaces.RealInput paCO2 annotation (Placement(
+          transformation(
+          rotation=90,
+          extent={{-6,-8},{6,8}},
+          origin={10,-80})));
+    Modelica.Blocks.Interfaces.RealOutput DeadSpaceOutput annotation (Placement(
+          transformation(
+          rotation=90,
+          extent={{-6,-8},{6,8}},
+          origin={24,86})));
+    Modelica.Blocks.Interfaces.RealOutput VentilationOutput annotation (
+        Placement(transformation(
+          rotation=180,
+          extent={{-6,-8},{6,8}},
+          origin={-66,0})));
+  equation
+    connect(pressure.y, add.u2)
+      annotation (Line(points={{22,-61},{22,-52}}, color={0,0,127}));
+    connect(add.y, product1.u1)
+      annotation (Line(points={{16,-29},{16,-2}}, color={0,0,127}));
+    connect(hydraulicConductance.y, product1.u2) annotation (Line(points={{48,
+            -23},{48,-10},{28,-10},{28,-2}}, color={0,0,127}));
+    connect(product1.y, gain.u) annotation (Line(points={{22,21},{22,40},{24,40},
+            {24,42}}, color={0,0,127}));
+    connect(product1.y, max1.u2) annotation (Line(points={{22,21},{22,34},{-6,
+            34},{-6,52},{-30,52}}, color={0,0,127}));
+    connect(const.y, max1.u1) annotation (Line(points={{-25,-6},{-16,-6},{-16,
+            40},{-30,40}}, color={0,0,127}));
+    connect(paCO2, add.u1)
+      annotation (Line(points={{10,-80},{10,-52}}, color={0,0,127}));
+    connect(DeadSpaceOutput, gain.y)
+      annotation (Line(points={{24,86},{24,65}}, color={0,0,127}));
+    connect(VentilationOutput, max1.y) annotation (Line(points={{-66,0},{-56,0},
+            {-56,46},{-53,46}}, color={0,0,127}));
+    connect(DeadSpaceOutput, DeadSpaceOutput)
+      annotation (Line(points={{24,86},{24,86}}, color={0,0,127}));
+    annotation (Diagram(coordinateSystem(extent={{-60,-80},{60,80}})), Icon(
+          coordinateSystem(extent={{-60,-80},{60,80}})));
+  end VentRegulation;
   annotation (uses(
       Physiolibrary(version="3.0.0-alpha8"),
       Modelica(version="4.0.0"),
