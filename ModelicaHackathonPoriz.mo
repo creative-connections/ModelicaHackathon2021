@@ -127,7 +127,8 @@ package ModelicaHackathonPoriz
       annotation (Placement(transformation(extent={{-98,206},{-78,226}})));
     Physiolibrary.Fluid.Components.VolumePump deadspace(redeclare package
         Medium =
-          Physiolibrary.Media.Air, SolutionFlow=DV*RR)
+          Physiolibrary.Media.Air,
+      useSolutionFlowInput=true,   SolutionFlow=DV*RR)
       annotation (Placement(transformation(extent={{-10,-10},{10,10}},
           rotation=0,
           origin={-6,236})));
@@ -135,8 +136,8 @@ package ModelicaHackathonPoriz
       useSolutionFlowInput=true,                                     SolutionFlow=
          TV*RR, redeclare package Medium = Physiolibrary.Media.Air)
                 annotation (Placement(transformation(extent={{82,228},{102,208}})));
-    Physiolibrary.Fluid.Sensors.FlowMeasure totalVentilation(redeclare package
-        Medium = Physiolibrary.Media.Air)
+    Physiolibrary.Fluid.Sensors.FlowMeasure totalRespiration_flow(redeclare
+        package Medium = Physiolibrary.Media.Air)
       annotation (Placement(transformation(extent={{52,208},{72,228}})));
     Chemical.Sources.SubstanceOutflow O2_left(SubstanceFlow(displayUnit=
             "mmol/min") = 0.00025666666666667) annotation (Placement(
@@ -163,24 +164,43 @@ package ModelicaHackathonPoriz
           Physiolibrary.Media.BloodBySiggaardAndersen,
                                                    Conductance=C_shunt)
       annotation (Placement(transformation(extent={{-8,106},{12,126}})));
-    Physiolibrary.Fluid.Sensors.PartialPressure partialPressure(
+    Physiolibrary.Fluid.Sensors.PartialPressure pCO2_arterial_pressure(
       redeclare package stateOfMatter = Chemical.Interfaces.IdealGas,
       substanceData=Chemical.Substances.CarbonDioxide_gas(),
       redeclare package Medium = Physiolibrary.Media.BloodBySiggaardAndersen)
       annotation (Placement(transformation(extent={{100,-60},{80,-80}})));
-    Modelica.Blocks.Math.Gain gain(k=15) annotation (Placement(transformation(
-          extent={{-7,-7},{7,7}},
-          rotation=90,
-          origin={119,185})));
     Modelica.Blocks.Math.Add add annotation (Placement(transformation(
           extent={{-7,-7},{7,7}},
           rotation=90,
-          origin={119,161})));
-    Modelica.Blocks.Sources.Constant const(k=-4.8) annotation (Placement(
-          transformation(
-          extent={{-5,-5},{5,5}},
+          origin={119,135})));
+    Physiolibrary.Types.Constants.PressureConst pressure(k(displayUnit="kPa")
+         = -4800) annotation (Placement(transformation(
+          extent={{-4,-4},{4,4}},
           rotation=90,
-          origin={123,137})));
+          origin={122,110})));
+    Physiolibrary.Types.Constants.HydraulicConductanceConst
+      hydraulicConductance2(k(displayUnit="ml/(kPa.min)") = 2.5e-07)
+      annotation (Placement(transformation(
+          extent={{-4,-4},{4,4}},
+          rotation=90,
+          origin={144,134})));
+    Modelica.Blocks.Math.Product product3 annotation (Placement(transformation(
+          extent={{-10,-10},{10,10}},
+          rotation=90,
+          origin={126,160})));
+    Modelica.Blocks.Math.Gain gain(k=0.3) annotation (Placement(transformation(
+          extent={{-6,-6},{6,6}},
+          rotation=90,
+          origin={144,194})));
+    Modelica.Blocks.Math.Max max1 annotation (Placement(transformation(
+          extent={{-7,-7},{7,7}},
+          rotation=90,
+          origin={111,189})));
+    Modelica.Blocks.Sources.Constant const(k=0) annotation (Placement(
+          transformation(
+          extent={{-4,-4},{4,4}},
+          rotation=90,
+          origin={106,172})));
   equation
     connect(left_heart.q_in, pulmonary_veins.q_in[1]) annotation (Line(
         points={{62,4},{62,65.95},{59.9,65.95}},
@@ -249,11 +269,12 @@ package ModelicaHackathonPoriz
         points={{12,-64},{-2,-64},{-2,-74},{-8,-74}},
         color={127,0,0},
         thickness=0.5));
-    connect(totalVentilation.q_out,totalRespiration. q_in) annotation (Line(
+    connect(totalRespiration_flow.q_out, totalRespiration.q_in) annotation (
+        Line(
         points={{72,218},{82,218}},
         color={127,0,0},
         thickness=0.5));
-    connect(totalVentilation.q_in,deadspace. q_out) annotation (Line(
+    connect(totalRespiration_flow.q_in, deadspace.q_out) annotation (Line(
         points={{52,218},{52,236},{4,236}},
         color={127,0,0},
         thickness=0.5));
@@ -286,10 +307,11 @@ package ModelicaHackathonPoriz
         points={{-12,194},{-12,216},{-78,216}},
         color={127,0,0},
         thickness=0.5));
-    connect(alveolarUnit[i].q_out, totalVentilation.q_in) annotation (Line(
-        points={{2,194},{2,218},{52,218}},
-        color={127,0,0},
-        thickness=0.5));
+      connect(alveolarUnit[i].q_out, totalRespiration_flow.q_in) annotation (
+          Line(
+          points={{2,194},{2,218},{52,218}},
+          color={127,0,0},
+          thickness=0.5));
     connect(alveolarUnit[i].q_in, pulmonary_arteries.q_in[4]) annotation (Line(
         points={{-8,174},{-8,156},{-60,156},{-60,112},{-60.1,112},{-60.1,64.05}},
         color={127,0,0},
@@ -306,22 +328,33 @@ package ModelicaHackathonPoriz
             -74.65}},
         color={127,0,0},
         thickness=0.5));
-    connect(partialPressure.port_a, arteries.substances[3]) annotation (Line(
-          points={{80,-70},{76,-70},{76,-74},{72,-74}}, color={158,66,200}));
-    connect(partialPressure.referenceFluidPort, arteries.q_in[4]) annotation (
-        Line(
+    connect(pCO2_arterial_pressure.port_a, arteries.substances[3]) annotation (
+        Line(points={{80,-70},{76,-70},{76,-74},{72,-74}}, color={158,66,200}));
+    connect(pCO2_arterial_pressure.referenceFluidPort, arteries.q_in[4])
+      annotation (Line(
         points={{90,-60.2},{90,-56},{62,-56},{62,-60},{60,-60},{60,-70},{62.1,
             -70},{62.1,-75.95}},
         color={127,0,0},
         thickness=0.5));
-    connect(add.y, gain.u)
-      annotation (Line(points={{119,168.7},{119,176.6}}, color={0,0,127}));
-    connect(partialPressure.partialPressure, add.u1) annotation (Line(points={{
-            100,-70},{100,152.6},{114.8,152.6}}, color={0,0,127}));
-    connect(const.y, add.u2) annotation (Line(points={{123,142.5},{123,148},{
-            132,148},{132,152.6},{123.2,152.6}}, color={0,0,127}));
-    connect(totalRespiration.solutionFlow, gain.y) annotation (Line(points={{92,
-            211},{92,196},{119,196},{119,192.7}}, color={0,0,127}));
+    connect(pressure.y, add.u2) annotation (Line(points={{122,115},{132,115},{
+            132,126.6},{123.2,126.6}}, color={0,0,127}));
+    connect(hydraulicConductance2.y, product3.u2) annotation (Line(points={{144,
+            139},{144,144},{132,144},{132,148}}, color={0,0,127}));
+    connect(gain.y, deadspace.solutionFlow) annotation (Line(points={{144,200.6},
+            {144,252},{-6,252},{-6,243}}, color={0,0,127}));
+    connect(gain.u, product3.y) annotation (Line(points={{144,186.8},{144,176},
+            {126,176},{126,171}}, color={0,0,127}));
+    connect(add.y, product3.u1) annotation (Line(points={{119,142.7},{106,142.7},
+            {106,148},{120,148}}, color={0,0,127}));
+    connect(add.u1, pCO2_arterial_pressure.partialPressure) annotation (Line(
+          points={{114.8,126.6},{106,126.6},{106,-62},{108,-62},{108,-70},{100,
+            -70}}, color={0,0,127}));
+    connect(max1.y, totalRespiration.solutionFlow) annotation (Line(points={{
+            111,196.7},{110,196.7},{110,200},{92,200},{92,211}}, color={0,0,127}));
+    connect(max1.u2, product3.y) annotation (Line(points={{115.2,180.6},{126,
+            180.6},{126,171}}, color={0,0,127}));
+    connect(const.y, max1.u1)
+      annotation (Line(points={{106,176.4},{106.8,180.6}}, color={0,0,127}));
     annotation (Diagram(coordinateSystem(extent={{-240,-200},{220,340}}),
           graphics={
           Rectangle(
@@ -341,14 +374,17 @@ package ModelicaHackathonPoriz
             textColor={0,0,0},
             textString="Cardio system"),
           Rectangle(
-            extent={{-120,-116},{118,-136}},
+            extent={{-120,-116},{184,-140}},
             lineColor={255,51,157},
             lineThickness=1),
           Text(
             extent={{-118,-118},{-62,-128}},
             textColor={0,0,0},
             textString="Cellular exchange"),
-          Rectangle(extent={{150,204},{84,120}}, lineColor={28,108,200})}),Icon(
+          Rectangle(
+            extent={{162,206},{98,102}},
+            lineColor={28,108,200},
+            lineThickness=0.5)}),                                          Icon(
           coordinateSystem(extent={{-240,-200},{220,340}})),
       experiment(StopTime=1800, __Dymola_Algorithm="Dassl"));
   end ComplexGasExchangeSystem;
