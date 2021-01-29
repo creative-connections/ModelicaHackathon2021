@@ -419,7 +419,7 @@ package Hack_Maduda_friday
     connect(DeadSpace.solutionFlow, product1.y)
       annotation (Line(points={{-44,37},{-44,76},{-9,76}}, color={0,0,127}));
     connect(ventRegulation.Vv, VentilationFlow.solutionFlow) annotation (Line(
-          points={{51.5556,46.75},{18,46.75},{18,19}}, color={0,0,127}));
+          points={{51.5556,47.75},{18,47.75},{18,19}}, color={0,0,127}));
     connect(shunt.q_in, circulation.PulmoCapillariesIn) annotation (Line(
         points={{-56,-52},{-72,-52},{-72,-78},{-50.392,-78},{-50.392,-76.68}},
         color={127,0,0},
@@ -1258,10 +1258,10 @@ package Hack_Maduda_friday
     Modelica.Blocks.Interfaces.RealOutput Vv annotation (Placement(transformation(
           rotation=180,
           extent={{-14,-14},{14,14}},
-          origin={-124,54}), iconTransformation(
+          origin={-124,62}), iconTransformation(
           extent={{-14,-14},{14,14}},
           rotation=180,
-          origin={-124,54})));
+          origin={-124,62})));
     Physiolibrary.Types.Constants.VolumeConst cc(k(displayUnit="l") = 0.00035)
       annotation (Placement(transformation(
           extent={{-4,-4},{4,4}},
@@ -1307,7 +1307,7 @@ package Hack_Maduda_friday
          = 0.001925) annotation (Placement(transformation(
           extent={{-4,-4},{4,4}},
           rotation=90,
-          origin={-12,-66})));
+          origin={-14,-66})));
     Physiolibrary.Types.Constants.PressureConst Cp(k(displayUnit="kPa") = 4300)
       annotation (Placement(transformation(
           extent={{-4,-4},{4,4}},
@@ -1340,8 +1340,8 @@ package Hack_Maduda_friday
     connect(Vv_nonregulated.y, Vv_val.u2)
       annotation (Line(points={{37,30.7},{37,53.2},{13.4,53.2}},
                                                                color={0,0,127}));
-    connect(paCO2, x.u1) annotation (Line(points={{-47,-79},{-48,-79},{-48,-56},
-            {-46,-56},{-46,-52}},
+    connect(paCO2, x.u1) annotation (Line(points={{-47,-79},{-48,-79},{-48,-54},
+            {-46,-54},{-46,-52}},
                        color={0,0,127}));
     connect(Vv_val.u1, const.y) annotation (Line(points={{13.4,44.8},{18,44.8},
             {18,43},{19.5,43}},
@@ -1349,7 +1349,7 @@ package Hack_Maduda_friday
     connect(cc.y, Vt.u1) annotation (Line(points={{-75,36},{-80.6,36},{-80.6,
             36.8}},
           color={0,0,127}));
-    connect(Vv, Vv_val.y) annotation (Line(points={{-124,54},{-14,54},{-14,49},
+    connect(Vv, Vv_val.y) annotation (Line(points={{-124,62},{-14,62},{-14,49},
             {-2.7,49}},
                   color={0,0,127}));
     connect(Vt.y, Vt_cond.u1) annotation (Line(points={{-96.7,41},{-104,41},{
@@ -1377,14 +1377,14 @@ package Hack_Maduda_friday
             -51.4}}, color={0,0,127}));
     connect(Cp.y, Pdiff.u2) annotation (Line(points={{44,-65},{44,-56},{33.2,
             -56},{33.2,-51.4}}, color={0,0,127}));
-    connect(W.y, slopeVv.u1) annotation (Line(points={{-12,-61},{-10,-61},{-10,
+    connect(W.y, slopeVv.u1) annotation (Line(points={{-14,-61},{-10,-61},{-10,
             -11.2},{-9.6,-11.2}}, color={0,0,127}));
     connect(Pdiff.y, min1.u2) annotation (Line(points={{29,-35.3},{29,-31.4},{
             23.2,-31.4}}, color={0,0,127}));
     connect(Pmax.y, min1.u1) annotation (Line(points={{2,-49},{2,-31.4},{14.8,
             -31.4}}, color={0,0,127}));
-    connect(min1.y, slopeVv.u2) annotation (Line(points={{19,-15.3},{19,-14},{2,
-            -14},{2,-26},{-2.4,-26},{-2.4,-11.2}}, color={0,0,127}));
+    connect(min1.y, slopeVv.u2) annotation (Line(points={{19,-15.3},{19,-14},{
+            -2.4,-14},{-2.4,-11.2}}, color={0,0,127}));
     connect(slopeVv.y, Vv_nonregulated.u2) annotation (Line(points={{-6,2.6},{
             -6,6},{41.2,6},{41.2,14.6}}, color={0,0,127}));
     annotation (Diagram(coordinateSystem(extent={{-120,-80},{60,80}})),Icon(
